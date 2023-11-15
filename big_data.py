@@ -46,6 +46,7 @@ def create_spectrogram(hazard_distribution_array):
     size = np.shape(hazard_distribution_array)
     img = np.zeros((size[0], size[1], 3), np.uint8)
     color = [
+        [255,255,255],
         [176, 211, 93],
         [190, 215, 72],
         [209, 223, 66],
@@ -70,27 +71,131 @@ def create_spectrogram(hazard_distribution_array):
     ]
     for x in range(size[0]):
         for y in range(size[1]):
-            if hazard_distribution_array[x][y] / 1 < 20:
-                n = hazard_distribution_array[x][y] // 1
-            elif hazard_distribution_array[x][y]== 0:
-                img[x][y][0] = 255
-                img[x][y][1] = 255
-                img[x][y][2] = 255
+            if hazard_distribution_array[x][y]< 20:
+                n = hazard_distribution_array[x][y]
             else:
                 n = 20
             img[x][y][0] = color[n][2]
             img[x][y][1] = color[n][1]
             img[x][y][2] = color[n][0]
+    #img=cv2.resize(img,(size[1]*2, size[0]*2))
+    #cv2.imshow("2",cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE))
+    print(img.shape)
     cv2.imshow("spectrogram", img)
+    #cv2.imshow("2", img[0:535,511:1022])
     cv2.waitKey(0)
 
-file_path = (
-    r"C:\Users\MicLab_LAPTOP\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
-)
-df = pd.read_csv(file_path, encoding="utf-8")
-boundary=Find_the_boundary(df)
-print(boundary)
-matrix = Create_map_matrix(boundary)
-punctuation(df,matrix,boundary)
-print(matrix)
-create_spectrogram(matrix)
+def creat_featrue_matrix(matrix,feature_matrix):
+    size=np.shape(matrix)
+    for x in range(size[0]):
+        for y in range(size[1]):
+            feature_matrix[x][y]=feature_matrix_point(matrix,x,y)
+
+def feature_matrix_point(matrix,x,y):
+    num=0
+    size=np.shape(matrix)
+    if(x-10<0):
+        x_1=0
+    else:
+        x_1=x-10
+    if(x+10>size[0]):
+        x_2=size[0]
+    else:
+        x_2=x+10
+    if(y-10<0):
+        y_1=0
+    else:
+        y_1=y-10
+    if(y+10>size[1]):
+        y_2=size[1]
+    else:
+        y_2=y+10
+
+    for i in range(x_1,x_2):
+        for j in range(y_1,y_2):
+            num+=matrix[i][j]
+    return num
+
+def search_max_point(matrix):
+    max=[0,0,0]
+    size=np.shape(matrix)
+    for x in range(size[0]):
+        for y in range(size[1]):
+            if(matrix[x][y]>max[2]):
+                max[0]=x
+                max[1]=y
+                max[2]=matrix[x][y]
+    return max
+            
+def matrix_area_zero(matrix,x,y):
+    size=np.shape(matrix)
+    if(x-10<0):
+        x_1=0
+    else:
+        x_1=x-10
+    if(x+10>size[0]):
+        x_2=size[0]
+    else:
+        x_2=x+10
+    if(y-10<0):
+        y_1=0
+    else:
+        y_1=y-10
+    if(y+10>size[1]):
+        y_2=size[1]
+    else:
+        y_2=y+10
+
+    for i in range(x_1,x_2):
+        for j in range(y_1,y_2):
+            matrix[i][j]=0
+
+def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y):
+    size=np.shape(matrix)
+    if(x-20<0):
+        x_1=0
+    else:
+        x_1=x-20
+    if(x+20>size[0]):
+        x_2=size[0]
+    else:
+        x_2=x+20
+    if(y-20<0):
+        y_1=0
+    else:
+        y_1=y-20
+    if(y+20>size[1]):
+        y_2=size[1]
+    else:
+        y_2=y+20
+
+    for i in range(x_1,x_2):
+        for j in range(y_1,y_2):
+            featrue_matrix[i][j]=feature_matrix_point(matrix,i,j)
+
+def main():
+    file_path = (
+        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
+    )
+    df = pd.read_csv(file_path, encoding="utf-8")
+    boundary=Find_the_boundary(df)
+    print(boundary)
+    matrix = Create_map_matrix(boundary)
+    punctuation(df,matrix,boundary)
+    print(matrix)
+    #create_spectrogram(matrix)
+    feature_matrix=Create_map_matrix(boundary)
+    creat_featrue_matrix(matrix,feature_matrix)
+    create_spectrogram(feature_matrix)
+    quantity=input("請輸入無人機數量:")
+    drone_location=[]
+    for i in range(int(quantity)):
+        drone_location.append(search_max_point(feature_matrix))
+        matrix_area_zero(matrix,drone_location[i][0],drone_location[i][1])
+        featrue_matrix_area_refresh(matrix,feature_matrix,drone_location[i][0],drone_location[i][1])
+        create_spectrogram(feature_matrix)
+    print(drone_location)
+    #for i in range(quantity):
+
+if __name__=="__main__":
+    main()
