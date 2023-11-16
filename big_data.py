@@ -176,7 +176,7 @@ def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y):
 
 def main():
     file_path = (
-        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
+        r"C:\Users\STUST\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
     )
     df = pd.read_csv(file_path, encoding="utf-8")
     boundary=Find_the_boundary(df)
