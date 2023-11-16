@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import cv2
+import folium
 
 def Find_the_boundary(df):
     max_lon = 0
@@ -71,8 +72,8 @@ def create_spectrogram(hazard_distribution_array):
     ]
     for x in range(size[0]):
         for y in range(size[1]):
-            if hazard_distribution_array[x][y]< 20:
-                n = hazard_distribution_array[x][y]
+            if hazard_distribution_array[x][y]/10 < 20:
+                n = hazard_distribution_array[x][y]//10
             else:
                 n = 20
             img[x][y][0] = color[n][2]
@@ -189,13 +190,22 @@ def main():
     create_spectrogram(feature_matrix)
     quantity=input("請輸入無人機數量:")
     drone_location=[]
+    mymap = folium.Map(location=[22.9969, 120.213], zoom_start=12)
+    j = 0
     for i in range(int(quantity)):
-        drone_location.append(search_max_point(feature_matrix))
+        max_point = search_max_point(feature_matrix)  
+        if max_point[2] < 60 :
+            break
+        folium.Marker([round((max_point[1]/1000)+boundary[3],3),round((max_point[0]/1000)+boundary[2],3)], popup= j ).add_to(mymap)
+        drone_location.append(max_point)
         matrix_area_zero(matrix,drone_location[i][0],drone_location[i][1])
         featrue_matrix_area_refresh(matrix,feature_matrix,drone_location[i][0],drone_location[i][1])
         create_spectrogram(feature_matrix)
+        j += 1
     print(drone_location)
     #for i in range(quantity):
+    print(j)
+    mymap.save("mymap.html")
 
 if __name__=="__main__":
     main()
