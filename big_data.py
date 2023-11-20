@@ -4,6 +4,15 @@ import math
 import cv2
 import folium
 
+def Judgment_time(i,start_time = None,end_time = None) :  
+    if start_time == None or end_time == None :
+        return True
+    hour , minute , second  = i // 10000 , math.floor(i / 10000 % 1*100) ,i % 100
+    if start_time <= hour and end_time >= hour:
+        return True
+    else :
+        return False
+
 def Find_the_boundary(df):
     max_lon = 0
     max_lat = 0
@@ -33,14 +42,16 @@ def Create_map_matrix(boundary) :
     matrix = np.zeros((wight+1, long+1), dtype=int)
     return matrix
 
-def punctuation(df,matrix,boundary):
+def punctuation(df,matrix,boundary,start_time = None,end_time = None):
     boundarys = list(boundary)
     min_wight =math.floor(boundarys[2] * 1000) / 1000
     min_long =math.floor(boundarys[3] * 1000) / 1000
-    for lon, lat in zip(df['GPS經度'], df['GPS緯度']):
-        long = round(lon - min_wight,3)*1000
-        wight = round(lat - min_long,3)*1000
-        matrix[int(long)][int(wight)] += 1
+    
+    for lon, lat , time in zip(df['GPS經度'], df['GPS緯度'],df['發生時間']): 
+        if Judgment_time(time,start_time,end_time ) :
+            long = round(lon - min_wight,3)*1000
+            wight = round(lat - min_long,3)*1000
+            matrix[int(long)][int(wight)] += 1
     return 0
 
 def create_spectrogram(hazard_distribution_array):
@@ -72,7 +83,7 @@ def create_spectrogram(hazard_distribution_array):
     ]
     for x in range(size[0]):
         for y in range(size[1]):
-            if hazard_distribution_array[x][y]/10 < 20:
+            if hazard_distribution_array[x][y]/10<20:
                 n = hazard_distribution_array[x][y]//10
             else:
                 n = 20
@@ -176,18 +187,20 @@ def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y):
 
 def main():
     file_path = (
-        r"C:\Users\STUST\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
+        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
     )
     df = pd.read_csv(file_path, encoding="utf-8")
     boundary=Find_the_boundary(df)
     print(boundary)
     matrix = Create_map_matrix(boundary)
-    punctuation(df,matrix,boundary)
+    punctuation(df,matrix,boundary,18,23)
     print(matrix)
-    #create_spectrogram(matrix)
+    
+    create_spectrogram(matrix)
     feature_matrix=Create_map_matrix(boundary)
     creat_featrue_matrix(matrix,feature_matrix)
     create_spectrogram(feature_matrix)
+    '''
     quantity=input("請輸入無人機數量:")
     drone_location=[]
     mymap = folium.Map(location=[22.9969, 120.213], zoom_start=12)
@@ -210,6 +223,6 @@ def main():
     #for i in range(quantity):
     print(j)
     mymap.save("mymap.html")
-
+'''
 if __name__=="__main__":
     main()
