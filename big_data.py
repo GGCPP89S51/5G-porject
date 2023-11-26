@@ -54,6 +54,7 @@ def punctuation(df,matrix,boundary,start_time = None,end_time = None):
             matrix[int(long)][int(wight)] += 1
     return 0
 
+
 def create_spectrogram(hazard_distribution_array):
     size = np.shape(hazard_distribution_array)
     img = np.zeros((size[0], size[1], 3), np.uint8)
