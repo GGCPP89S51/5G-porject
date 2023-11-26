@@ -90,6 +90,7 @@ class Function :
             for y in range(size[1]):
                 if hazard_distribution_array[x][y]/Size<20:
                     n = hazard_distribution_array[x][y]//Size
+                    n = int(n)
                 else:
                     n = 20
                 img[x][y][0] = color[n][2]
@@ -104,17 +105,18 @@ class Function :
             
     #建立時間範圍內的地圖矩陣
     def Create_a_map_matrix_within_a_time_range(df,boundary,start_time=None,end_time=None) :
-        matrix = Feature_value_judgment.Create_map_matrix(boundary)
-        Feature_value_judgment.punctuation(df,matrix,boundary,start_time,end_time)
+        matrix = Function.Create_map_matrix(boundary)
+        Function.punctuation(df,matrix,boundary,start_time,end_time)
         print(matrix)
-        Feature_value_judgment.create_spectrogram(matrix,1)
+        Function.create_spectrogram(matrix,1)
         return matrix
     
 #特徵值判斷演算法
 class Feature_value_judgment(Function):
     
-    #建立陣列
-    def __init__(self,file,start_time = None,end_time = None):  
+    #建立地圖陣列
+    def __init__(self,file,start_time = None,end_time = None,radius=0):
+        self.radius = radius  
         #搜尋文件     
         df = pd.read_csv(file, encoding="utf-8") 
         #地圖的(最東)(最北)(最西)(最南)
@@ -122,6 +124,39 @@ class Feature_value_judgment(Function):
         #print(boundary)
         self.matrix = Function.Create_a_map_matrix_within_a_time_range(df,self.boundary,start_time,end_time)
         
+        
+    #判斷圓形之單位矩陣
+    def Identity_matrix(radius):
+        array_size = radius * 2 + 1
+        original_array = np.zeros((array_size, array_size), dtype=int)
+        center_x, center_y = array_size // 2, array_size // 2
+
+        for i in range(array_size):
+            for j in range(array_size):
+                if np.sqrt((i - center_x)**2 + (j - center_y)**2) <= radius:
+                    original_array[i, j] = 1
+        return original_array
+    
+    #計算特徵值
+    def convolution(matrix_1, matrix_2,radius):
+        ans = 0
+        for i in range(radius*2+1):
+            for j in range(radius*2+1):
+                ans += matrix_1[i][j] * matrix_2[i][j]
+        return ans
+    
+    #計算特徵值矩陣
+    def create_feature_matrix(matrix, padding_matrx, drone_coverage_matrix,radius):
+        feature_matrix = np.zeros((matrix.shape))
+        size = np.shape(matrix)
+        for i in range(size[0]):
+            for j in range(size[1]):
+                feature_matrix[i][j] = Feature_value_judgment.convolution(
+                    drone_coverage_matrix, padding_matrx[i : i + radius*2+1, j : j + radius*2+1],radius
+                )
+        return feature_matrix
+    
+         
     #計算特徵值    
     def feature_matrix_point(matrix,x,y):
         num=0
@@ -147,14 +182,14 @@ class Feature_value_judgment(Function):
             for j in range(y_1,y_2):
                 num+=matrix[i][j]
         return num
-    
+    '''
     #將特徵值注入矩陣    
     def creat_featrue_matrix(matrix,feature_matrix):
         size=np.shape(matrix)
         for x in range(size[0]):
             for y in range(size[1]):
                 feature_matrix[x][y]=Feature_value_judgment.feature_matrix_point(matrix,x,y)    
-        
+    '''        
     #搜尋特徵值矩陣最大的點
     def search_max_point(matrix):
         max=[0,0,0]
@@ -167,8 +202,9 @@ class Feature_value_judgment(Function):
                     max[2]=matrix[x][y]
         return max
     
+    '''
     #特徵值過濾函式
-    def matrix_area_zero(matrix,x,y):
+    def delete_matrix_area_zero(matrix,x,y):
         size=np.shape(matrix)
         if(x-10<0):
             x_1=0
@@ -190,7 +226,17 @@ class Feature_value_judgment(Function):
         for i in range(x_1,x_2):
             for j in range(y_1,y_2):
                 matrix[i][j]=0
-        
+    '''
+    def matrix_area_zero(matrix,x,y,zero_matrix,radius):
+        small_long = x - radius
+        long_long = x + radius+1
+        small_tail = y - radius
+        long_tail = y + radius+1
+        for i in range(small_long,long_long):
+            for j in range(small_tail,long_tail):
+                matrix[i][j] = matrix[i][j] * zero_matrix[i - small_long][j - small_tail]
+                
+    #矩陣重新計算
     def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y):
         size=np.shape(matrix)
         if(x-20<0):
@@ -213,33 +259,45 @@ class Feature_value_judgment(Function):
         for i in range(x_1,x_2):
             for j in range(y_1,y_2):
                 featrue_matrix[i][j]=Feature_value_judgment.feature_matrix_point(matrix,i,j)
-            
+     
+           
     #部屬點計算
-    def Point(matrix,feature_matrix):
+    def Point(matrix,feature_matrix,radius):
         quantity=input("請輸入無人機數量:")
         drone_location=[]
+        identity_matrix = Feature_value_judgment.Identity_matrix(radius)
+        zero_matrix = np.where(identity_matrix == 0, 1, 0)
         for i in range(int(quantity)):
             max_point = Feature_value_judgment.search_max_point(feature_matrix)  
             if max_point[2] < 60 :
                 break
             drone_location.append(max_point)
-            Feature_value_judgment.matrix_area_zero(matrix,drone_location[i][0],drone_location[i][1])
+            Feature_value_judgment.matrix_area_zero(matrix,max_point[0],max_point[1],zero_matrix,radius)
+            Function.create_spectrogram(feature_matrix,10)
             Feature_value_judgment.featrue_matrix_area_refresh(matrix,feature_matrix,drone_location[i][0],drone_location[i][1])
             Function.create_spectrogram(feature_matrix,10)
         return drone_location
+
     
     #找尋部屬點
     def Deployment_point(self):
         #特徵值矩陣
-        feature_matrix=Function.Create_map_matrix(self.boundary)
-        Feature_value_judgment.creat_featrue_matrix(self.matrix,feature_matrix)
+        identity_matrix = Feature_value_judgment.Identity_matrix(self.radius)
+        
+        padding_matrx = np.pad(self.matrix, pad_width=self.radius, mode='constant', constant_values=0)
+        
+        feature_matrix = Feature_value_judgment.create_feature_matrix(self.matrix, padding_matrx, identity_matrix,self.radius)
+        
         Function.create_spectrogram(feature_matrix,10)
-        print(Feature_value_judgment.Point(self.matrix,feature_matrix))
-    
+        
+        print(Feature_value_judgment.Point(self.matrix,feature_matrix,self.radius))
+        
+        
 def main():
     test = Feature_value_judgment((
         r"C:\Users\MicLab_LAPTOP\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
-    ),0,23)
+    ),0,23,10)
+    
     test.Deployment_point()
     
 if __name__==main():
