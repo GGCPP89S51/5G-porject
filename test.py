@@ -32,6 +32,7 @@ def create_drone_coverage_matrix(distance):
                 (i - distance) * (i - distance) + (j - distance) * (j - distance)
             ) > distance_square:
                 matrix[i][j] = 0
+    print(matrix)
     return matrix
 
 
@@ -42,6 +43,7 @@ def create_padding_matrix(matrix, padding):
     for i in range(padding, padding + size[0]):
         for j in range(padding, padding + size[1]):
             padding_matrix[i][j] = matrix[i - padding][j - padding]
+    print(padding_matrix)
     return padding_matrix
 
 
