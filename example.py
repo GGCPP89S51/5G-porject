@@ -267,6 +267,13 @@ class Feature_value_judgment(Function):
             for j in range(small_tail,long_tail):
                 sub_matrix[i - small_long][j - small_tail] = matrix[i][j]
         padding_matrx = np.pad(sub_matrix, pad_width=radius, mode='constant', constant_values=0)
+        np.savetxt("padding_matrx.csv", padding_matrx, delimiter=",", fmt="%d")
+        print(small_long,small_tail,long_long,long_tail,radius,size)
+        '''
+        for i in range(max(small_long-radius,0),min(long_long+radius,size[0])):
+            for j in range(max(small_tail-radius,0),min(long_tail+radius,size[1])):
+                padding_matrx[max(i - small_long-radius,0)][max(i - small_tail-radius,0)] = matrix[i][j]
+        '''               
         identity_matrix = Feature_value_judgment.Identity_matrix(radius) 
         new_matrix = Feature_value_judgment.create_feature_matrix(sub_matrix, padding_matrx, identity_matrix,radius)
         for i in range(small_long,long_long):
