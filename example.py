@@ -262,23 +262,20 @@ class Feature_value_judgment(Function):
         small_tail = max(y - radius*2, 0)
         long_tail = min(y + radius*2 + 1, size[1])
         
-        sub_matrix = np.zeros((long_long - small_long, long_tail - small_tail), dtype=int)
-        for i in range(small_long,long_long):
-            for j in range(small_tail,long_tail):
-                sub_matrix[i - small_long][j - small_tail] = matrix[i][j]
+        sub_matrix = np.zeros((min(long_long + radius,size[0] ) - max(small_long - radius,0), min(long_tail + radius,size[1]) - max(small_tail - radius,0)), dtype=int)
+        for i in range(max(small_long - radius,0),min(long_long + radius,size[0])):
+            for j in range(max(small_tail- radius,0),min(long_tail+radius,size[1])):
+                sub_matrix[i - small_long- radius][j - small_tail- radius] = matrix[i][j]
+        
         padding_matrx = np.pad(sub_matrix, pad_width=radius, mode='constant', constant_values=0)
-        np.savetxt("padding_matrx.csv", padding_matrx, delimiter=",", fmt="%d")
-        print(small_long,small_tail,long_long,long_tail,radius,size)
-        '''
-        for i in range(max(small_long-radius,0),min(long_long+radius,size[0])):
-            for j in range(max(small_tail-radius,0),min(long_tail+radius,size[1])):
-                padding_matrx[max(i - small_long-radius,0)][max(i - small_tail-radius,0)] = matrix[i][j]
-        '''               
-        identity_matrix = Feature_value_judgment.Identity_matrix(radius) 
+
+        identity_matrix = Feature_value_judgment.Identity_matrix(radius)
+
         new_matrix = Feature_value_judgment.create_feature_matrix(sub_matrix, padding_matrx, identity_matrix,radius)
+
         for i in range(small_long,long_long):
             for j in range(small_tail,long_tail):
-                featrue_matrix[i][j]=new_matrix[i - small_long][j - small_tail]
+                featrue_matrix[i][j]=new_matrix[i - small_long + radius][j - small_tail + radius]
     #部屬點計算
     def Point(self,matrix,feature_matrix,radius):
         quantity=input("請輸入無人機數量:")
@@ -314,7 +311,7 @@ class Feature_value_judgment(Function):
         
 def main():
     test = Feature_value_judgment((
-        r"C:\Users\MicLab_LAPTOP\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
+        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
     ),0,23,10)
     
     test.Deployment_point()
