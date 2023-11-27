@@ -156,7 +156,7 @@ class Feature_value_judgment(Function):
                 )
         return feature_matrix
     
-         
+    '''     
     #計算特徵值    
     def feature_matrix_point(matrix,x,y):
         num=0
@@ -182,7 +182,8 @@ class Feature_value_judgment(Function):
             for j in range(y_1,y_2):
                 num+=matrix[i][j]
         return num
-    '''
+    
+    
     #將特徵值注入矩陣    
     def creat_featrue_matrix(matrix,feature_matrix):
         size=np.shape(matrix)
@@ -228,53 +229,64 @@ class Feature_value_judgment(Function):
                 matrix[i][j]=0
     '''
     def matrix_area_zero(matrix,x,y,zero_matrix,radius):
+        size = np.shape(matrix)
         small_long = x - radius
+        
+        if small_long < 0:
+            small_long = 0
+            
         long_long = x + radius+1
+        
+        if long_long > size[0]:
+            long_long = size[0]
+            
         small_tail = y - radius
+        
+        if small_tail < 0:
+            small_tail = 0
+            
         long_tail = y + radius+1
+        
+        if long_tail > size[1]:
+            long_tail = size[1]        
+        
         for i in range(small_long,long_long):
             for j in range(small_tail,long_tail):
                 matrix[i][j] = matrix[i][j] * zero_matrix[i - small_long][j - small_tail]
                 
     #矩陣重新計算
-    def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y):
-        size=np.shape(matrix)
-        if(x-20<0):
-            x_1=0
-        else:
-            x_1=x-20
-        if(x+20>size[0]):
-            x_2=size[0]
-        else:
-            x_2=x+20
-        if(y-20<0):
-            y_1=0
-        else:
-            y_1=y-20
-        if(y+20>size[1]):
-            y_2=size[1]
-        else:
-            y_2=y+20
-
-        for i in range(x_1,x_2):
-            for j in range(y_1,y_2):
-                featrue_matrix[i][j]=Feature_value_judgment.feature_matrix_point(matrix,i,j)
-     
-           
+    def featrue_matrix_area_refresh(matrix,featrue_matrix,x,y,radius):
+        size = np.shape(matrix)
+        small_long = max(x - radius*2, 0)
+        long_long = min(x + radius*2 + 1, size[0])
+        small_tail = max(y - radius*2, 0)
+        long_tail = min(y + radius*2 + 1, size[1])
+        
+        sub_matrix = np.zeros((long_long - small_long, long_tail - small_tail), dtype=int)
+        for i in range(small_long,long_long):
+            for j in range(small_tail,long_tail):
+                sub_matrix[i - small_long][j - small_tail] = matrix[i][j]
+        padding_matrx = np.pad(sub_matrix, pad_width=radius, mode='constant', constant_values=0)
+        identity_matrix = Feature_value_judgment.Identity_matrix(radius) 
+        new_matrix = Feature_value_judgment.create_feature_matrix(sub_matrix, padding_matrx, identity_matrix,radius)
+        for i in range(small_long,long_long):
+            for j in range(small_tail,long_tail):
+                featrue_matrix[i][j]=new_matrix[i - small_long][j - small_tail]
     #部屬點計算
-    def Point(matrix,feature_matrix,radius):
+    def Point(self,matrix,feature_matrix,radius):
         quantity=input("請輸入無人機數量:")
         drone_location=[]
         identity_matrix = Feature_value_judgment.Identity_matrix(radius)
         zero_matrix = np.where(identity_matrix == 0, 1, 0)
+        
         for i in range(int(quantity)):
             max_point = Feature_value_judgment.search_max_point(feature_matrix)  
             if max_point[2] < 60 :
                 break
             drone_location.append(max_point)
             Feature_value_judgment.matrix_area_zero(matrix,max_point[0],max_point[1],zero_matrix,radius)
-            Function.create_spectrogram(feature_matrix,10)
-            Feature_value_judgment.featrue_matrix_area_refresh(matrix,feature_matrix,drone_location[i][0],drone_location[i][1])
+            Function.create_spectrogram(matrix,0.1)
+            Feature_value_judgment.featrue_matrix_area_refresh(matrix,feature_matrix,drone_location[i][0],drone_location[i][1],self.radius)
             Function.create_spectrogram(feature_matrix,10)
         return drone_location
 
@@ -290,7 +302,7 @@ class Feature_value_judgment(Function):
         
         Function.create_spectrogram(feature_matrix,10)
         
-        print(Feature_value_judgment.Point(self.matrix,feature_matrix,self.radius))
+        print(Feature_value_judgment.Point(self,self.matrix,feature_matrix,self.radius))
         
         
 def main():
