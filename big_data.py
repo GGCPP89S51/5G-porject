@@ -5,6 +5,7 @@ import cv2
 import folium
 from sklearn.model_selection import train_test_split
 from geopy.distance import geodesic
+from folium import plugins
 
 class Function:
     # 將時間分割並判斷
@@ -120,6 +121,7 @@ class Function:
 class Feature_value_judgment(Function):
     # 建立地圖陣列
     def __init__(self, file, start_time=None, end_time=None, radius=0):
+        
         self.radius = radius
         # 搜尋文件
         df = pd.read_csv(file, encoding="utf-8")
@@ -129,7 +131,8 @@ class Feature_value_judgment(Function):
         self.test_df.to_csv('test_data.csv', index=False)
         self.boundary = self.Find_the_boundary(self.train_df)
         self.matrix = self.Create_a_map_matrix_within_a_time_range(self.train_df,self.boundary,start_time,end_time)
-
+        self.initial_location = [self.boundary[1], self.boundary[0]]
+        self.mymap = folium.Map(location=self.initial_location, zoom_start=15)
     # 判斷圓形之單位矩陣
     def Identity_matrix(self, radius):
         array_size = radius * 2 + 1
@@ -339,12 +342,12 @@ class Feature_value_judgment(Function):
     def Deployment_point(self):
         # 特徵值矩陣
         identity_matrix = self.Identity_matrix(self.radius)
-        # self.create_spectrogram(identity_matrix, 1)
+        #self.create_spectrogram(identity_matrix, 1)
 
         padding_matrx = np.pad(
             self.matrix, pad_width=self.radius, mode="constant", constant_values=0
         )
-        # self.create_spectrogram(padding_matrx, 1)
+        #self.create_spectrogram(padding_matrx, 1)
 
         feature_matrix = self.create_feature_matrix(
             self.matrix, padding_matrx, identity_matrix, self.radius
@@ -357,7 +360,7 @@ class Feature_value_judgment(Function):
         """
         print(self.matrix.shape, feature_matrix.shape)
 
-        # self.create_spectrogram(feature_matrix, 10)
+        #self.create_spectrogram(feature_matrix, 10)
         np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
         deployment_point = self.Point(self.matrix, feature_matrix, self.radius)
         print(deployment_point)
@@ -373,6 +376,9 @@ class Feature_value_judgment(Function):
         for i in range(len(point)):
             end_point[i][0] = round(point[i][0]/1000 + self.boundary[2],3)
             end_point[i][1] = round(point[i][1]/1000 + self.boundary[3],3)
+            end_point[i][2] = point[i][2]
+            folium.Marker(location=[end_point[i][1],end_point[i][0]], popup='Your Location').add_to(self.mymap)
+            folium.Circle(location=[end_point[i][1],end_point[i][0]], radius=1000, color='blue', fill=True, fill_color='blue').add_to(self.mymap)
 
         for i in range(len(test_point)):
             for j in range(len(end_point)):
@@ -385,7 +391,11 @@ class Feature_value_judgment(Function):
 
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
+        print("",
+              end_point)
         print(Probability,"%")
+        folium.LayerControl().add_to(self.mymap)
+        self.mymap.save('my_map.html')
 
     def test(self):
         csv_filename = "matrix"
