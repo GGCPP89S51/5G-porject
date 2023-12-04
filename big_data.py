@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from geopy.distance import geodesic
 from folium import plugins
 
+
 class Function:
     # 將時間分割並判斷
     def Judgment_time(self, i, start_time=None, end_time=None):
@@ -121,18 +122,22 @@ class Function:
 class Feature_value_judgment(Function):
     # 建立地圖陣列
     def __init__(self, file, start_time=None, end_time=None, radius=0):
-        
         self.radius = radius
         # 搜尋文件
         df = pd.read_csv(file, encoding="utf-8")
         # 地圖的(最東)(最北)(最西)(最南)
-        self.train_df, self.test_df = train_test_split(df, test_size=0.15, random_state=42)
-        self.train_df.to_csv('train_data.csv', index=False)
-        self.test_df.to_csv('test_data.csv', index=False)
+        self.train_df, self.test_df = train_test_split(
+            df, test_size=0.15, random_state=42
+        )
+        self.train_df.to_csv("train_data.csv", index=False)
+        self.test_df.to_csv("test_data.csv", index=False)
         self.boundary = self.Find_the_boundary(self.train_df)
-        self.matrix = self.Create_a_map_matrix_within_a_time_range(self.train_df,self.boundary,start_time,end_time)
+        self.matrix = self.Create_a_map_matrix_within_a_time_range(
+            self.train_df, self.boundary, start_time, end_time
+        )
         self.initial_location = [self.boundary[1], self.boundary[0]]
         self.mymap = folium.Map(location=self.initial_location, zoom_start=15)
+
     # 判斷圓形之單位矩陣
     def Identity_matrix(self, radius):
         array_size = radius * 2 + 1
@@ -166,7 +171,7 @@ class Feature_value_judgment(Function):
                     padding_matrx[i : i + radius * 2 + 1, j : j + radius * 2 + 1],
                     radius,
                 )
-            print(str(i // (size[0] / 100)) + "%")
+            self.schedule = str(i // (size[0] / 100)) + "%"
         return feature_matrix
 
     """     
@@ -326,7 +331,7 @@ class Feature_value_judgment(Function):
             self.matrix_area_zero(
                 matrix, max_point[0], max_point[1], zero_matrix, radius
             )
-            #self.create_spectrogram(matrix, 0.1)
+            # self.create_spectrogram(matrix, 0.1)
             self.featrue_matrix_area_refresh(
                 matrix,
                 feature_matrix,
@@ -334,7 +339,7 @@ class Feature_value_judgment(Function):
                 drone_location[i][1],
                 self.radius,
             )
-            #self.create_spectrogram(feature_matrix, 10)
+            # self.create_spectrogram(feature_matrix, 10)
 
         return drone_location
 
@@ -342,12 +347,12 @@ class Feature_value_judgment(Function):
     def Deployment_point(self):
         # 特徵值矩陣
         identity_matrix = self.Identity_matrix(self.radius)
-        #self.create_spectrogram(identity_matrix, 1)
+        # self.create_spectrogram(identity_matrix, 1)
 
         padding_matrx = np.pad(
             self.matrix, pad_width=self.radius, mode="constant", constant_values=0
         )
-        #self.create_spectrogram(padding_matrx, 1)
+        # self.create_spectrogram(padding_matrx, 1)
 
         feature_matrix = self.create_feature_matrix(
             self.matrix, padding_matrx, identity_matrix, self.radius
@@ -360,42 +365,51 @@ class Feature_value_judgment(Function):
         """
         print(self.matrix.shape, feature_matrix.shape)
 
-        #self.create_spectrogram(feature_matrix, 10)
+        # self.create_spectrogram(feature_matrix, 10)
         np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
         deployment_point = self.Point(self.matrix, feature_matrix, self.radius)
         print(deployment_point)
         print(np.shape(deployment_point))
-        return(deployment_point)
+        return deployment_point
 
     def Accuracy_calculation(self):
         point = self.Deployment_point()
         end_point = [[0, 0, 0.0] for _ in range(len(point))]
-        test_point = [[lon, lat] for lon, lat in zip(self.test_df["GPS經度"], self.test_df["GPS緯度"])]
+        test_point = [
+            [lon, lat] for lon, lat in zip(self.test_df["GPS經度"], self.test_df["GPS緯度"])
+        ]
         counter = len(test_point)
-        
+
         for i in range(len(point)):
-            end_point[i][0] = round(point[i][0]/1000 + self.boundary[2],3)
-            end_point[i][1] = round(point[i][1]/1000 + self.boundary[3],3)
+            end_point[i][0] = round(point[i][0] / 1000 + self.boundary[2], 3)
+            end_point[i][1] = round(point[i][1] / 1000 + self.boundary[3], 3)
             end_point[i][2] = point[i][2]
-            folium.Marker(location=[end_point[i][1],end_point[i][0]], popup='Your Location').add_to(self.mymap)
-            folium.Circle(location=[end_point[i][1],end_point[i][0]], radius=1000, color='blue', fill=True, fill_color='blue').add_to(self.mymap)
+            folium.Marker(
+                location=[end_point[i][1], end_point[i][0]], popup="Your Location"
+            ).add_to(self.mymap)
+            folium.Circle(
+                location=[end_point[i][1], end_point[i][0]],
+                radius=1000,
+                color="blue",
+                fill=True,
+                fill_color="blue",
+            ).add_to(self.mymap)
 
         for i in range(len(test_point)):
             for j in range(len(end_point)):
                 coord1 = (end_point[j][1], end_point[j][0])
                 coord2 = (test_point[i][1], test_point[i][0])
                 distance_km = geodesic(coord1, coord2).kilometers
-                if distance_km <= 1 :
+                if distance_km <= 1:
                     counter -= 1
                     break
 
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
-        print("",
-              end_point)
-        print(Probability,"%")
+        print("", end_point)
+        print(Probability, "%")
         folium.LayerControl().add_to(self.mymap)
-        self.mymap.save('my_map.html')
+        self.mymap.save("my_map.html")
 
     def test(self):
         csv_filename = "matrix"
@@ -404,9 +418,7 @@ class Feature_value_judgment(Function):
 
 
 def main():
-    file_path = (
-        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
-    )
+    file_path = r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
     test = Feature_value_judgment(file_path, 0, 23, 10)
     test.Accuracy_calculation()
 
