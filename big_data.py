@@ -15,13 +15,17 @@ class Feature_value_judgment():
         self.train_df, self.test_df = None ,None
         self.matrix_changes = []
         self.featrue_matrix_changes = []
-    
+        self.num = 0
+        self.counter = 0
+        self.end_point = []
+        self.Probability = 0
     #輸入檔案
     def inputFile(self,file) :
         df = pd.read_csv(file, encoding="utf-8")
         self.train_df, self.test_df = train_test_split(df, test_size=0.15, random_state=42)
         self.start_time , self.End_time= 0 , 0
         self.matrix = None
+        self.quantity = 100
         '''
         self.train_df.to_csv('train_data.csv', index=False)
         self.test_df.to_csv('test_data.csv', index=False)
@@ -31,7 +35,7 @@ class Feature_value_judgment():
     
     #輸入無人機時速
     def inputDroneSpeed(self,speed) : 
-        self.radius = speed / 6
+        self.radius = int(speed / 6)
 
     #輸入開始時間
     def inputStarttime(self,start_time):
@@ -40,6 +44,10 @@ class Feature_value_judgment():
     #輸入結束時間
     def inputEndtime(self,end_time):
         self.end_time = end_time
+
+    #輸入無人機數量
+    def inputQuantity(self,quantity):
+        self.quantity = quantity
 
     #建立地圖矩陣
     def __createMatrix(self):
@@ -112,7 +120,7 @@ class Feature_value_judgment():
                 matrix[int(long)][int(wight)] += 1
 
     # 矩陣可視化
-    def __createSpectrogram(self, hazard_distribution_array, Size):
+    def createSpectrogram(self, hazard_distribution_array, Size):
         size = np.shape(hazard_distribution_array)
         img = np.zeros((size[0], size[1], 3), np.uint8)
         color = [
@@ -163,7 +171,7 @@ class Feature_value_judgment():
         matrix = self.__createMapMatrix(boundary)
         self.__punctuation(df, matrix, boundary, start_time, end_time)
         print(matrix)
-        self.__createSpectrogram(matrix, 1)
+        self.createSpectrogram(matrix, 1)
         return matrix
 
     # 判斷圓形之特徵矩陣
@@ -303,6 +311,7 @@ class Feature_value_judgment():
                 matrix[i][j] = (
                     matrix[i][j] * zero_matrix[i - small_long][j - small_tail]
                 )
+        self.matrix_changes.append(matrix.copy())
 
     # 矩陣重新計算
     def __featrueMatrixAreaRefresh(self, matrix, featrue_matrix, x, y, radius):
@@ -340,10 +349,11 @@ class Feature_value_judgment():
                     padding_matrix[i : i + radius * 2 + 1, j : j + radius * 2 + 1],
                     radius,
                 )
+        self.featrue_matrix_changes.append(featrue_matrix.copy())
 
     # 部屬點計算
     def __point(self, matrix, feature_matrix, radius):
-        quantity = input("請輸入無人機數量:")
+        quantity = self.quantity
         drone_location = []
         identity_matrix = self.__eigenvalueMatrix(radius)
         # print(identity_matrix)
@@ -354,6 +364,7 @@ class Feature_value_judgment():
             max_point = self.__searchMaxPoint(feature_matrix)
             if max_point[2] < 60:
                 break
+            self.quantity += 1
             drone_location.append(max_point)
             print(max_point)
             self.__matrixAreaZero(
@@ -401,7 +412,7 @@ class Feature_value_judgment():
         print(np.shape(deployment_point))
         return(deployment_point)
 
-    def accuracyCalculation(self):
+    def __accuracyCalculation(self):
         self.__createMatrix()
         point = self.__deploymentPoint()
         end_point = [[0, 0, 0.0] for _ in range(len(point))]
@@ -412,9 +423,7 @@ class Feature_value_judgment():
             end_point[i][0] = round(point[i][0]/1000 + self.boundary[2],3)
             end_point[i][1] = round(point[i][1]/1000 + self.boundary[3],3)
             end_point[i][2] = point[i][2]
-            folium.Marker(location=[end_point[i][1],end_point[i][0]], popup='Your Location').add_to(self.mymap)
-            folium.Circle(location=[end_point[i][1],end_point[i][0]], radius=1000, color='blue', fill=True, fill_color='blue').add_to(self.mymap)
-
+            
         for i in range(len(test_point)):
             for j in range(len(end_point)):
                 coord1 = (end_point[j][1], end_point[j][0])
@@ -426,12 +435,34 @@ class Feature_value_judgment():
 
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
+        self.end_point =end_point
+        self.Probability = Probability
         print("",
               end_point)
         print(Probability,"%")
 
+    #計算
+    def calculate(self):
+        self.__accuracyCalculation()
 
+    def outNumberDrones(self) :
+        return self.quantity
 
+    def outputMatrixChanges(self,i):
+        self.createSpectrogram(self.matrix_changes[i],0.1)
+        return self.matrix_changes[i]
+        
+
+    def outputFeatrueMatrixChanges(self,i):
+        self.createSpectrogram(self.featrue_matrix_changes[i],10)
+        return self.featrue_matrix_changes[i]
+    
+    def outEndPoint(self) :
+        return self.end_point
+
+    def outputProbability(self):
+        return self.Probability
+    
 def main():
     file_path = (
         r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
@@ -440,7 +471,13 @@ def main():
     test.inputFile(file_path)
     test.inputStarttime(0)
     test.inputEndtime(23)
-    test.accuracyCalculation
+    test.inputDroneSpeed(60)
+    test.calculate()
+    print(test.outNumberDrones())
+    test.outputMatrixChanges(1)
+    test.outputFeatrueMatrixChanges(1)
+    print(test.outEndPoint())
+    print(test.outputProbability())
 
 
 if __name__ == main():
