@@ -210,41 +210,7 @@ class Feature_value_judgment():
             print(str(i // (size[0] / 100)) + "%")
         return feature_matrix
 
-    """     
-    #計算特徵值    
-    def feature_matrix_point(matrix,x,y):
-        num=0
-        size=np.shape(matrix)
-        if(x-10<0):
-            x_1=0
-        else:
-            x_1=x-10
-        if(x+10>size[0]):
-            x_2=size[0]
-        else:
-            x_2=x+10
-        if(y-10<0):
-            y_1=0
-        else:
-            y_1=y-10
-        if(y+10>size[1]):
-            y_2=size[1]
-        else:
-            y_2=y+10
-
-        for i in range(x_1,x_2):
-            for j in range(y_1,y_2):
-                num+=matrix[i][j]
-        return num
-    
-    
-    #將特徵值注入矩陣    
-    def creat_featrue_matrix(matrix,feature_matrix):
-        size=np.shape(matrix)
-        for x in range(size[0]):
-            for y in range(size[1]):
-                feature_matrix[x][y]=Feature_value_judgment.feature_matrix_point(matrix,x,y)    
-    """
+   
 
     # 搜尋特徵值矩陣最大的點
     def __searchMaxPoint(self, matrix):
@@ -258,31 +224,6 @@ class Feature_value_judgment():
                     max[2] = matrix[x][y]
         return max
 
-    """
-    #特徵值過濾函式
-    def delete_matrix_area_zero(matrix,x,y):
-        size=np.shape(matrix)
-        if(x-10<0):
-            x_1=0
-        else:
-            x_1=x-10
-        if(x+10>size[0]):
-            x_2=size[0]
-        else:
-            x_2=x+10
-        if(y-10<0):
-            y_1=0
-        else:
-            y_1=y-10
-        if(y+10>size[1]):
-            y_2=size[1]
-        else:
-            y_2=y+10
-
-        for i in range(x_1,x_2):
-            for j in range(y_1,y_2):
-                matrix[i][j]=0
-    """
 
     def __matrixAreaZero(self, matrix, x, y, zero_matrix, radius):
         size = np.shape(matrix)
@@ -321,21 +262,7 @@ class Feature_value_judgment():
         small_tail = max(y - radius * 2, 0)
         long_tail = min(y + radius * 2 + 1, size[1])
 
-        """
-        sub_matrix = np.zeros(
-            (long_long - small_long, long_tail - small_tail), dtype=int
-        )
-        for i in range(small_long, long_long):
-            for j in range(small_tail, long_tail):
-                sub_matrix[i - small_long][j - small_tail] = matrix[i][j]
-        padding_matrx = np.pad(
-            sub_matrix, pad_width=radius, mode="constant", constant_values=0
-        )
-        identity_matrix = self.Identity_matrix(radius)
-        new_matrix = self.create_feature_matrix(
-            sub_matrix, padding_matrx, identity_matrix, radius
-        )
-        """
+
         identity_matrix = self.__eigenvalueMatrix(radius)
         padding_matrix = np.pad(
             matrix, pad_width=radius, mode="constant", constant_values=0
@@ -487,6 +414,5 @@ def main():
     print(test.outputProbability())
 
 
-
-if __name__ == main():
+if __name__ == '__main__':
     main()
