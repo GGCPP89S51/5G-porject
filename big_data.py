@@ -364,7 +364,7 @@ class Feature_value_judgment():
             max_point = self.__searchMaxPoint(feature_matrix)
             if max_point[2] < 60:
                 break
-            self.quantity += 1
+            self.num+= 1
             drone_location.append(max_point)
             print(max_point)
             self.__matrixAreaZero(
@@ -445,23 +445,29 @@ class Feature_value_judgment():
     def calculate(self):
         self.__accuracyCalculation()
 
+    #輸出無人機數量
     def outNumberDrones(self) :
-        return self.quantity
+        return self.num
 
+    #輸出地圖矩陣
     def outputMatrixChanges(self,i):
         self.createSpectrogram(self.matrix_changes[i],0.1)
         return self.matrix_changes[i]
         
-
+    #輸出特徵值矩陣
     def outputFeatrueMatrixChanges(self,i):
         self.createSpectrogram(self.featrue_matrix_changes[i],10)
         return self.featrue_matrix_changes[i]
     
+    #輸出部屬點
     def outEndPoint(self) :
         return self.end_point
 
+    #輸出覆蓋率
     def outputProbability(self):
         return self.Probability
+    
+
     
 def main():
     file_path = (
@@ -472,12 +478,14 @@ def main():
     test.inputStarttime(0)
     test.inputEndtime(23)
     test.inputDroneSpeed(60)
+    test.inputQuantity(10)
     test.calculate()
     print(test.outNumberDrones())
     test.outputMatrixChanges(1)
     test.outputFeatrueMatrixChanges(1)
     print(test.outEndPoint())
     print(test.outputProbability())
+
 
 
 if __name__ == main():
