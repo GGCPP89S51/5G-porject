@@ -397,7 +397,7 @@ class Feature_value_judgment:
 
 
 def main():
-    file_path = r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
+    file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Feature_value_judgment()
     test.inputFile(file_path)
     test.inputStarttime(0)
