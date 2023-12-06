@@ -7,71 +7,76 @@ from sklearn.model_selection import train_test_split
 from geopy.distance import geodesic
 from folium import plugins
 
+
 # 特徵值判斷演算法
-class Feature_value_judgment():
+class Feature_value_judgment:
     # 建立地圖陣列
     def __init__(self):
-        self.radius = 10 #單位100m
-        self.train_df, self.test_df = None ,None
+        self.radius = 10  # 單位100m
+        self.train_df, self.test_df = None, None
         self.matrix_changes = []
         self.featrue_matrix_changes = []
         self.num = 0
         self.counter = 0
         self.end_point = []
         self.Probability = 0
-    #輸入檔案
-    def inputFile(self,file) :
+
+    # 輸入檔案
+    def inputFile(self, file):
         df = pd.read_csv(file, encoding="utf-8")
-        self.train_df, self.test_df = train_test_split(df, test_size=0.15, random_state=42)
-        self.start_time , self.End_time= 0 , 0
+        self.train_df, self.test_df = train_test_split(
+            df, test_size=0.15, random_state=42
+        )
+        self.start_time, self.End_time = 0, 0
         self.matrix = None
         self.quantity = 100
-        '''
+        """
         self.train_df.to_csv('train_data.csv', index=False)
         self.test_df.to_csv('test_data.csv', index=False)
-        '''
+        """
         # 地圖的(最東)(最北)(最西)(最南)
         self.boundary = self.__findBoundary(self.train_df)
-    
-    #輸入無人機時速
-    def inputDroneSpeed(self,speed) : 
+
+    # 輸入無人機時速
+    def inputDroneSpeed(self, speed):
         self.radius = int(speed / 6)
 
-    #輸入開始時間
-    def inputStarttime(self,start_time):
+    # 輸入開始時間
+    def inputStarttime(self, start_time):
         self.start_time = start_time
 
-    #輸入結束時間
-    def inputEndtime(self,end_time):
+    # 輸入結束時間
+    def inputEndtime(self, end_time):
         self.end_time = end_time
 
-    #輸入無人機數量
-    def inputQuantity(self,quantity):
+    # 輸入無人機數量
+    def inputQuantity(self, quantity):
         self.quantity = quantity
 
-    #建立地圖矩陣
+    # 建立地圖矩陣
     def __createMatrix(self):
-        self.matrix = self.__createMapMatrixTimeRange(self.train_df,self.boundary,self.start_time,self.end_time)
+        self.matrix = self.__createMapMatrixTimeRange(
+            self.train_df, self.boundary, self.start_time, self.end_time
+        )
         self.matrix_changes.append(self.matrix.copy())
-        '''
+        """
         self.initial_location = [22.9969 , 120.213]
         self.mymap = folium.Map(location=self.initial_location, zoom_start=15)
-        '''
+        """
+
     # 將時間分割並判斷
     def __judgmentTime(self, i, start_time=None, end_time=None):
         if start_time == None or end_time == None:
             return True
         hour, minute, second = i // 10000, math.floor(i / 10000 % 1 * 100), i % 100
-        if start_time > end_time :
-            start_time ,end_time = end_time,start_time
+        if start_time > end_time:
+            start_time, end_time = end_time, start_time
             if start_time >= hour and end_time <= hour:
-
                 return True
             else:
                 return False
-            
-        if start_time <= hour and end_time >= hour:
 
+        if start_time <= hour and end_time >= hour:
             return True
         else:
             return False
@@ -159,15 +164,14 @@ class Feature_value_judgment():
                 img[x][y][2] = color[n][0]
         # img=cv2.resize(img,(size[1]*2, size[0]*2))
         # cv2.imshow("2",cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE))
-        print(img.shape)
-        cv2.imshow("spectrogram", img)
+        # print(img.shape)
+        # cv2.imshow("spectrogram", img)
         # cv2.imshow("2", img[0:535,511:1022])
-        cv2.waitKey(0)
+        # cv2.waitKey(10)
+        return img
 
     # 建立時間範圍內的地圖矩陣
-    def __createMapMatrixTimeRange(
-        self, df, boundary, start_time=None, end_time=None
-    ):
+    def __createMapMatrixTimeRange(self, df, boundary, start_time=None, end_time=None):
         matrix = self.__createMapMatrix(boundary)
         self.__punctuation(df, matrix, boundary, start_time, end_time)
         print(matrix)
@@ -210,8 +214,6 @@ class Feature_value_judgment():
             print(str(i // (size[0] / 100)) + "%")
         return feature_matrix
 
-   
-
     # 搜尋特徵值矩陣最大的點
     def __searchMaxPoint(self, matrix):
         max = [0, 0, 0]
@@ -223,7 +225,6 @@ class Feature_value_judgment():
                     max[1] = y
                     max[2] = matrix[x][y]
         return max
-
 
     def __matrixAreaZero(self, matrix, x, y, zero_matrix, radius):
         size = np.shape(matrix)
@@ -262,7 +263,6 @@ class Feature_value_judgment():
         small_tail = max(y - radius * 2, 0)
         long_tail = min(y + radius * 2 + 1, size[1])
 
-
         identity_matrix = self.__eigenvalueMatrix(radius)
         padding_matrix = np.pad(
             matrix, pad_width=radius, mode="constant", constant_values=0
@@ -291,13 +291,13 @@ class Feature_value_judgment():
             max_point = self.__searchMaxPoint(feature_matrix)
             if max_point[2] < 60:
                 break
-            self.num+= 1
+            self.num += 1
             drone_location.append(max_point)
             print(max_point)
             self.__matrixAreaZero(
                 matrix, max_point[0], max_point[1], zero_matrix, radius
             )
-            #self.create_spectrogram(matrix, 0.1)
+            # self.create_spectrogram(matrix, 0.1)
             self.__featrueMatrixAreaRefresh(
                 matrix,
                 feature_matrix,
@@ -305,7 +305,7 @@ class Feature_value_judgment():
                 drone_location[i][1],
                 self.radius,
             )
-            #self.create_spectrogram(feature_matrix, 10)
+            # self.create_spectrogram(feature_matrix, 10)
 
         return drone_location
 
@@ -313,12 +313,12 @@ class Feature_value_judgment():
     def __deploymentPoint(self):
         # 特徵值矩陣
         eigenvalue_matrix = self.__eigenvalueMatrix(self.radius)
-        #self.create_spectrogram(identity_matrix, 1)
+        # self.create_spectrogram(identity_matrix, 1)
 
         padding_matrx = np.pad(
             self.matrix, pad_width=self.radius, mode="constant", constant_values=0
         )
-        #self.create_spectrogram(padding_matrx, 1)
+        # self.create_spectrogram(padding_matrx, 1)
 
         feature_matrix = self.__createFeatureMatrix(
             self.matrix, padding_matrx, eigenvalue_matrix, self.radius
@@ -332,74 +332,72 @@ class Feature_value_judgment():
         """
         print(self.matrix.shape, feature_matrix.shape)
 
-        #self.create_spectrogram(feature_matrix, 10)
+        # self.create_spectrogram(feature_matrix, 10)
         np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
         deployment_point = self.__point(self.matrix, feature_matrix, self.radius)
         print(deployment_point)
         print(np.shape(deployment_point))
-        return(deployment_point)
+        return deployment_point
 
     def __accuracyCalculation(self):
         self.__createMatrix()
         point = self.__deploymentPoint()
         end_point = [[0, 0, 0.0] for _ in range(len(point))]
-        test_point = [[lon, lat] for lon, lat in zip(self.test_df["GPS經度"], self.test_df["GPS緯度"])]
+        test_point = [
+            [lon, lat] for lon, lat in zip(self.test_df["GPS經度"], self.test_df["GPS緯度"])
+        ]
         counter = len(test_point)
-        
+
         for i in range(len(point)):
-            end_point[i][0] = round(point[i][0]/1000 + self.boundary[2],3)
-            end_point[i][1] = round(point[i][1]/1000 + self.boundary[3],3)
+            end_point[i][0] = round(point[i][0] / 1000 + self.boundary[2], 3)
+            end_point[i][1] = round(point[i][1] / 1000 + self.boundary[3], 3)
             end_point[i][2] = point[i][2]
-            
+
         for i in range(len(test_point)):
             for j in range(len(end_point)):
                 coord1 = (end_point[j][1], end_point[j][0])
                 coord2 = (test_point[i][1], test_point[i][0])
                 distance_km = geodesic(coord1, coord2).kilometers
-                if distance_km <= 1 :
+                if distance_km <= 1:
                     counter -= 1
                     break
 
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
-        self.end_point =end_point
+        self.end_point = end_point
         self.Probability = Probability
-        print("",
-              end_point)
-        print(Probability,"%")
+        print("", end_point)
+        print(Probability, "%")
 
-    #計算
+    # 計算
     def calculate(self):
         self.__accuracyCalculation()
 
-    #輸出無人機數量
-    def outNumberDrones(self) :
+    # 輸出無人機數量
+    def outNumberDrones(self):
         return self.num
 
-    #輸出地圖矩陣
-    def outputMatrixChanges(self,i):
-        self.createSpectrogram(self.matrix_changes[i],0.1)
+    # 輸出地圖矩陣
+    def outputMatrixChanges(self, i):
+        self.createSpectrogram(self.matrix_changes[i], 0.1)
         return self.matrix_changes[i]
-        
-    #輸出特徵值矩陣
-    def outputFeatrueMatrixChanges(self,i):
-        self.createSpectrogram(self.featrue_matrix_changes[i],10)
+
+    # 輸出特徵值矩陣
+    def outputFeatrueMatrixChanges(self, i):
+        self.createSpectrogram(self.featrue_matrix_changes[i], 10)
         return self.featrue_matrix_changes[i]
-    
-    #輸出部屬點
-    def outEndPoint(self) :
+
+    # 輸出部屬點
+    def outEndPoint(self):
         return self.end_point
 
-    #輸出覆蓋率
+    # 輸出覆蓋率
     def outputProbability(self):
         return self.Probability
-    
 
-    
+
 def main():
-    file_path = (
-        r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
-    )
+    file_path = r"C:\Users\s0901\Downloads\20a0110c-525e-4138-ae1a-d352c09beca5.csv"
     test = Feature_value_judgment()
     test.inputFile(file_path)
     test.inputStarttime(0)
@@ -414,5 +412,5 @@ def main():
     print(test.outputProbability())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
