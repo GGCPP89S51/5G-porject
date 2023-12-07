@@ -20,16 +20,20 @@ class Feature_value_judgment:
         self.counter = 0
         self.end_point = []
         self.Probability = 0
+        self.start_time = 0
+        self.end_time =  24
+        self.matrix = None
+        self.quantity = 100
+        self.Features_lowest = 60
 
     # 輸入檔案
     def inputFile(self, file):
         df = pd.read_csv(file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self.__judgmentTime(x, start_time=self.start_time, end_time=self.end_time))]
         self.train_df, self.test_df = train_test_split(
             df, test_size=0.15, random_state=42
         )
-        self.start_time, self.End_time = 0, 0
-        self.matrix = None
-        self.quantity = 100
+        
         """
         self.train_df.to_csv('train_data.csv', index=False)
         self.test_df.to_csv('test_data.csv', index=False)
@@ -52,6 +56,9 @@ class Feature_value_judgment:
     # 輸入無人機數量
     def inputQuantity(self, quantity):
         self.quantity = quantity
+
+    def inputFeaturesLowest(self, Features_lowest):
+        self.Features_lowest = Features_lowest
 
     # 建立地圖矩陣
     def __createMatrix(self):
@@ -289,7 +296,7 @@ class Feature_value_judgment:
 
         for i in range(int(quantity)):
             max_point = self.__searchMaxPoint(feature_matrix)
-            if max_point[2] < 60:
+            if max_point[2] < self.Features_lowest:
                 break
             self.num += 1
             drone_location.append(max_point)
@@ -401,9 +408,10 @@ def main():
     test = Feature_value_judgment()
     test.inputFile(file_path)
     test.inputStarttime(0)
-    test.inputEndtime(23)
-    test.inputDroneSpeed(60)
-    test.inputQuantity(10)
+    test.inputEndtime(12)
+    test.inputDroneSpeed(45)
+    test.inputQuantity(100)
+    test.inputFeaturesLowest(10)
     test.calculate()
     print(test.outNumberDrones())
     test.outputMatrixChanges(1)
