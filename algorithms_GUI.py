@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets, QtCore,QtWebEngineWidgets
+from PyQt6 import QtWidgets, QtCore #,QtWebEngineWidgets
 import sys, cv2, big_data
 from PyQt6.QtGui import *
 
