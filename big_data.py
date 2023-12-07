@@ -25,6 +25,10 @@ class Feature_value_judgment:
         self.matrix = None
         self.quantity = 100
         self.Features_lowest = 60
+        self.area_matrix = None
+        self.total_sum = 0
+        self.Area = 0
+        self.city_area = 0
 
     # 輸入檔案
     def inputFile(self, file):
@@ -57,8 +61,13 @@ class Feature_value_judgment:
     def inputQuantity(self, quantity):
         self.quantity = quantity
 
+    #輸入最小風險值
     def inputFeaturesLowest(self, Features_lowest):
         self.Features_lowest = Features_lowest
+
+    #輸入城市總面積
+    def inputCityArea(self,city_area):
+        self.city_area = city_area
 
     # 建立地圖矩陣
     def __createMatrix(self):
@@ -70,6 +79,10 @@ class Feature_value_judgment:
         self.initial_location = [22.9969 , 120.213]
         self.mymap = folium.Map(location=self.initial_location, zoom_start=15)
         """
+        self.area_matrix = self.__createMapMatrix(self.boundary)
+        self.area_matrix = np.pad(
+            self.area_matrix, pad_width=self.radius, mode="constant", constant_values=0
+        )
 
     # 將時間分割並判斷
     def __judgmentTime(self, i, start_time=None, end_time=None):
@@ -172,9 +185,9 @@ class Feature_value_judgment:
         # img=cv2.resize(img,(size[1]*2, size[0]*2))
         # cv2.imshow("2",cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE))
         # print(img.shape)
-        # cv2.imshow("spectrogram", img)
+        #cv2.imshow("spectrogram", img)
         # cv2.imshow("2", img[0:535,511:1022])
-        # cv2.waitKey(10)
+        #cv2.waitKey(0)
         return img
 
     # 建立時間範圍內的地圖矩陣
@@ -260,6 +273,12 @@ class Feature_value_judgment:
                 matrix[i][j] = (
                     matrix[i][j] * zero_matrix[i - small_long][j - small_tail]
                 )
+                if zero_matrix[i - small_long][j - small_tail] == 0:
+                    self.area_matrix[i][j] = 1
+                elif self.area_matrix[i][j] != 1: 
+                    self.area_matrix[i][j] = 0
+                
+        
         self.matrix_changes.append(matrix.copy())
 
     # 矩陣重新計算
@@ -369,12 +388,22 @@ class Feature_value_judgment:
                     counter -= 1
                     break
 
+        np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
         self.end_point = end_point
         self.Probability = Probability
         print("", end_point)
         print(Probability, "%")
+        self.calculateArea()
+
+    def calculateArea(self) :
+        for row in self.area_matrix:
+            for element in row:
+                self.total_sum += element
+        
+        self.Area  = self.total_sum * 0.1 * 0.1
+        print (self.Area)
 
     # 計算
     def calculate(self):
@@ -401,6 +430,15 @@ class Feature_value_judgment:
     # 輸出覆蓋率
     def outputProbability(self):
         return self.Probability
+    
+    #輸出覆蓋面積
+    def outCoverageArea(self):
+        return self.Area
+    
+    #輸出覆蓋面積在城市占比
+    def outputProportionAreaCity(self):
+        area = self.Area/self.city_area * 100
+        return area
 
 
 def main():
@@ -408,14 +446,16 @@ def main():
     test = Feature_value_judgment()
     test.inputFile(file_path)
     test.inputStarttime(0)
-    test.inputEndtime(12)
-    test.inputDroneSpeed(45)
+    test.inputEndtime(24)
+    test.inputDroneSpeed(60)
     test.inputQuantity(100)
-    test.inputFeaturesLowest(10)
+    test.inputFeaturesLowest(60)
+    test.inputCityArea(2192)
     test.calculate()
     print(test.outNumberDrones())
     test.outputMatrixChanges(1)
     test.outputFeatrueMatrixChanges(1)
+    test.outputProportionAreaCity()
     print(test.outEndPoint())
     print(test.outputProbability())
 
