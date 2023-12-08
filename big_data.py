@@ -21,7 +21,7 @@ class Feature_value_judgment:
         self.end_point = []
         self.Probability = 0
         self.start_time = 0
-        self.end_time =  24
+        self.end_time = 24
         self.matrix = None
         self.quantity = 100
         self.Features_lowest = 60
@@ -33,11 +33,17 @@ class Feature_value_judgment:
     # 輸入檔案
     def inputFile(self, file):
         df = pd.read_csv(file, encoding="utf-8")
-        df = df[df['發生時間'].apply(lambda x: self.__judgmentTime(x, start_time=self.start_time, end_time=self.end_time))]
+        df = df[
+            df["發生時間"].apply(
+                lambda x: self.__judgmentTime(
+                    x, start_time=self.start_time, end_time=self.end_time
+                )
+            )
+        ]
         self.train_df, self.test_df = train_test_split(
             df, test_size=0.15, random_state=42
         )
-        
+
         """
         self.train_df.to_csv('train_data.csv', index=False)
         self.test_df.to_csv('test_data.csv', index=False)
@@ -61,12 +67,12 @@ class Feature_value_judgment:
     def inputQuantity(self, quantity):
         self.quantity = quantity
 
-    #輸入最小風險值
+    # 輸入最小風險值
     def inputFeaturesLowest(self, Features_lowest):
         self.Features_lowest = Features_lowest
 
-    #輸入城市總面積
-    def inputCityArea(self,city_area):
+    # 輸入城市總面積
+    def inputCityArea(self, city_area):
         self.city_area = city_area
 
     # 建立地圖矩陣
@@ -185,9 +191,9 @@ class Feature_value_judgment:
         # img=cv2.resize(img,(size[1]*2, size[0]*2))
         # cv2.imshow("2",cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE))
         # print(img.shape)
-        #cv2.imshow("spectrogram", img)
+        # cv2.imshow("spectrogram", img)
         # cv2.imshow("2", img[0:535,511:1022])
-        #cv2.waitKey(0)
+        # cv2.waitKey(0)
         return img
 
     # 建立時間範圍內的地圖矩陣
@@ -275,10 +281,9 @@ class Feature_value_judgment:
                 )
                 if zero_matrix[i - small_long][j - small_tail] == 0:
                     self.area_matrix[i][j] = 1
-                elif self.area_matrix[i][j] != 1: 
+                elif self.area_matrix[i][j] != 1:
                     self.area_matrix[i][j] = 0
-                
-        
+
         self.matrix_changes.append(matrix.copy())
 
     # 矩陣重新計算
@@ -397,13 +402,13 @@ class Feature_value_judgment:
         print(Probability, "%")
         self.calculateArea()
 
-    def calculateArea(self) :
+    def calculateArea(self):
         for row in self.area_matrix:
             for element in row:
                 self.total_sum += element
-        
-        self.Area  = self.total_sum * 0.1 * 0.1
-        print (self.Area)
+
+        self.Area = self.total_sum * 0.1 * 0.1
+        print(self.Area)
 
     # 計算
     def calculate(self):
@@ -430,20 +435,59 @@ class Feature_value_judgment:
     # 輸出覆蓋率
     def outputProbability(self):
         return self.Probability
-    
-    #輸出覆蓋面積
+
+    # 輸出覆蓋面積
     def outCoverageArea(self):
         return self.Area
-    
-    #輸出覆蓋面積在城市占比
+
+    # 輸出覆蓋面積在城市占比
     def outputProportionAreaCity(self):
-        area = self.Area/self.city_area * 100
+        area = self.Area / self.city_area * 100
         return area
+
+    # 輸出Googlemap圖片url
+    def outputImgWebUrl(self, key, num=None):
+        center = [23.16, 120.35]
+        zoom = 10
+        size = [470, 470]
+        maker = "markers=size:tiny|Ccolor:red|23.229,120.348"
+        url = "https://maps.googleapis.com/maps/api/staticmap?"
+        if num == None:
+            url = url + "center=23.16,120.35" + "&" + "zoom=10" + "&" + "size=470x470"
+            for i in self.end_point:
+                url = url + "&" + "markers="
+                url = url + "size:tiny"
+                url = url + "|" + "color:red"
+                url = url + "|" + str(i[1]) + "," + str(i[0])
+        else:
+            for index, i in enumerate(self.end_point):
+                if index == num:
+                    url = (
+                        url
+                        + "center="
+                        + str(i[1])
+                        + ","
+                        + str(i[0])
+                        + "&"
+                        + "zoom=14"
+                        + "&"
+                        + "size=470x470"
+                    )
+                    url = (
+                        url
+                        + "&markers=size:mid|color:red|"
+                        + str(i[1])
+                        + ","
+                        + str(i[0])
+                    )
+        url = url + "&" + "key=" + key
+        return url
 
 
 def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Feature_value_judgment()
+
     test.inputFile(file_path)
     test.inputStarttime(0)
     test.inputEndtime(24)
@@ -458,6 +502,7 @@ def main():
     test.outputProportionAreaCity()
     print(test.outEndPoint())
     print(test.outputProbability())
+    # print(test.outputImgWebUrl("AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo"))
 
 
 if __name__ == "__main__":
