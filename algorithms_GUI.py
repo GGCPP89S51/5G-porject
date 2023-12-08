@@ -27,17 +27,13 @@ class Algorithms_GUI(QtWidgets.QWidget):
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
-            img = self.test.createSpectrogram(
-                self.test.outputMatrixChanges(self.slider.value()), 1
-            )
+            img = self.test.outputMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
         elif self.img_combobox.currentIndex() == 1:
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
-            img = self.test.createSpectrogram(
-                self.test.outputFeatrueMatrixChanges(self.slider.value()), 10
-            )
+            img = self.test.outputFeatrueMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
         elif self.img_combobox.currentIndex() == 2:
             url = QtCore.QUrl(self.test.outputImgWebUrl(key))
@@ -78,11 +74,17 @@ class Algorithms_GUI(QtWidgets.QWidget):
         )
         self.probabilityOutput.setText(str(self.test.outputProbability()) + "%")
         dronePosition = self.test.outEndPoint()
-        for i in dronePosition:
-            position = ""
-            for s in i:
-                position = position + str(s) + " "
-            self.dronePositionListwidget.addItem(position)
+        for index, i in enumerate(dronePosition):
+            item = (
+                str(index)
+                + " 緯度:"
+                + str(i[1])
+                + ", 經度:"
+                + str(i[0])
+                + ", 危險值:"
+                + str(int(i[2]))
+            )
+            self.dronePositionListwidget.addItem(item)
 
     def clear(self):
         self.dronePositionListwidget.clear()
@@ -143,7 +145,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.cityAreaInput.setText(str(2192))
         self.droneDispatchQuantityLabel = QtWidgets.QLabel("無人機部屬數量:")
         self.droneDispatchQuantityOutput = QtWidgets.QLabel()
-        self.droneCoverageAreaLabel = QtWidgets.QLabel("無人機覆蓋面積:")
+        self.droneCoverageAreaLabel = QtWidgets.QLabel("無人機覆蓋面積(平方公里):")
         self.droneCoverageAreaOutput = QtWidgets.QLabel()
         self.droneProportionAreaCityLabel = QtWidgets.QLabel("無人機覆蓋面積占比:")
         self.droneProportionAreaCityOutput = QtWidgets.QLabel()
@@ -187,7 +189,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# AIzaSyA78g4tyIBvgBQnmm0EyaBn93a4VPHmfag
-# AIzaSyCtJC2xi_WZf4g0Ek1dC__mhmB7p26BOY4
-# AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo

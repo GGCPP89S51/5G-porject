@@ -80,7 +80,7 @@ class Feature_value_judgment:
         self.matrix = self.__createMapMatrixTimeRange(
             self.train_df, self.boundary, self.start_time, self.end_time
         )
-        self.matrix_changes.append(self.matrix.copy())
+        self.matrix_changes.append(self.createSpectrogram(self.matrix, 1))
         """
         self.initial_location = [22.9969 , 120.213]
         self.mymap = folium.Map(location=self.initial_location, zoom_start=15)
@@ -194,6 +194,7 @@ class Feature_value_judgment:
         # cv2.imshow("spectrogram", img)
         # cv2.imshow("2", img[0:535,511:1022])
         # cv2.waitKey(0)
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         return img
 
     # 建立時間範圍內的地圖矩陣
@@ -284,7 +285,7 @@ class Feature_value_judgment:
                 elif self.area_matrix[i][j] != 1:
                     self.area_matrix[i][j] = 0
 
-        self.matrix_changes.append(matrix.copy())
+        self.matrix_changes.append(self.createSpectrogram(matrix, 1))
 
     # 矩陣重新計算
     def __featrueMatrixAreaRefresh(self, matrix, featrue_matrix, x, y, radius):
@@ -307,7 +308,7 @@ class Feature_value_judgment:
                     padding_matrix[i : i + radius * 2 + 1, j : j + radius * 2 + 1],
                     radius,
                 )
-        self.featrue_matrix_changes.append(featrue_matrix.copy())
+        self.featrue_matrix_changes.append(self.createSpectrogram(featrue_matrix, 10))
 
     # 部屬點計算
     def __point(self, matrix, feature_matrix, radius):
@@ -354,7 +355,7 @@ class Feature_value_judgment:
         feature_matrix = self.__createFeatureMatrix(
             self.matrix, padding_matrx, eigenvalue_matrix, self.radius
         )
-        self.featrue_matrix_changes.append(feature_matrix.copy())
+        self.featrue_matrix_changes.append(self.createSpectrogram(feature_matrix, 10))
 
         """
         csv_file = "matrix.csv"
@@ -420,12 +421,10 @@ class Feature_value_judgment:
 
     # 輸出地圖矩陣
     def outputMatrixChanges(self, i):
-        self.createSpectrogram(self.matrix_changes[i], 0.1)
         return self.matrix_changes[i]
 
     # 輸出特徵值矩陣
     def outputFeatrueMatrixChanges(self, i):
-        self.createSpectrogram(self.featrue_matrix_changes[i], 10)
         return self.featrue_matrix_changes[i]
 
     # 輸出部屬點
