@@ -3,6 +3,7 @@ import sys, cv2, big_data
 from PyQt6.QtGui import *
 from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 
+
 key = "AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo"
 
 
@@ -24,18 +25,21 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
     def show_img(self):
         if self.img_combobox.currentIndex() == 0:
+            img = QImage("AccidentsListImg.png")
+            self.label.setPixmap(QPixmap.fromImage(img))
+        elif self.img_combobox.currentIndex() == 1:
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
             img = self.test.outputMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
-        elif self.img_combobox.currentIndex() == 1:
+        elif self.img_combobox.currentIndex() == 2:
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
             img = self.test.outputFeatrueMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
-        elif self.img_combobox.currentIndex() == 2:
+        elif self.img_combobox.currentIndex() == 3:
             url = QtCore.QUrl(self.test.outputImgWebUrl(key))
             self.load_map_image(url)
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -123,7 +127,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.file_name_label = QtWidgets.QLabel()
         self.file_name_label.setWordWrap(True)
         self.img_combobox = QtWidgets.QComboBox(self)
-        self.img_combobox.addItems(["分布圖", "特徵圖", "部屬位置"])
+        self.img_combobox.addItems(["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機部屬位置地圖"])
         self.img_combobox.currentIndexChanged.connect(self.show_img)
         self.img_combobox.setDisabled(True)
         self.droneQuantityLabel = QtWidgets.QLabel("無人機數量:")

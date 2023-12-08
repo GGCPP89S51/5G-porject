@@ -6,6 +6,7 @@ import folium
 from sklearn.model_selection import train_test_split
 from geopy.distance import geodesic
 from folium import plugins
+import matplotlib.pyplot as plt
 
 
 # 特徵值判斷演算法
@@ -29,6 +30,7 @@ class Feature_value_judgment:
         self.total_sum = 0
         self.Area = 0
         self.city_area = 0
+        self.accidents_list = [0] * 24
 
     # 輸入檔案
     def inputFile(self, file):
@@ -92,6 +94,7 @@ class Feature_value_judgment:
 
     # 將時間分割並判斷
     def __judgmentTime(self, i, start_time=None, end_time=None):
+        self.accidents_list[i // 10000] += 1
         if start_time == None or end_time == None:
             return True
         hour, minute, second = i // 10000, math.floor(i / 10000 % 1 * 100), i % 100
@@ -402,6 +405,16 @@ class Feature_value_judgment:
         print("", end_point)
         print(Probability, "%")
         self.calculateArea()
+        self.__creatAccidentsListImg()
+
+    def __creatAccidentsListImg(self):
+        x = list(range(24))
+        fig = plt.figure(figsize=(5.5, 5.5))
+        plt.bar(x, self.accidents_list)
+        plt.xlabel("time")
+        plt.ylabel("Number of car accidents")
+        plt.title("Distribution of car accidents in different time periods")
+        plt.savefig("AccidentsListImg.png")
 
     def calculateArea(self):
         for row in self.area_matrix:
@@ -501,6 +514,7 @@ def main():
     test.outputProportionAreaCity()
     print(test.outEndPoint())
     print(test.outputProbability())
+    print(test.accidents_list)
     # print(test.outputImgWebUrl("AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo"))
 
 
