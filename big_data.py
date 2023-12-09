@@ -85,21 +85,19 @@ class Feature_value_judgment:
         )
 
     # 將時間分割並判斷
-    def __judgmentTime(self, i, start_time=None, end_time=None):
-        if start_time == None or end_time == None:
+    def __judgmentTime(self, time_value, start_time=None, end_time=None):
+        if start_time is None or end_time is None:
             return True
-        hour, minute, second = i // 10000, math.floor(i / 10000 % 1 * 100), i % 100
-        if start_time > end_time:
-            start_time, end_time = end_time, start_time
-            if start_time >= hour and end_time <= hour:
-                return True
-            else:
-                return False
 
-        if start_time <= hour and end_time >= hour:
-            return True
-        else:
-            return False
+    # 將時間值轉換為小時、分鐘和秒
+        hour, minute, second = time_value // 10000, math.floor(time_value / 10000 % 1 * 100), time_value % 100
+
+        # 確保開始時間小於結束時間
+        if start_time > end_time:
+            return (hour >= start_time and hour < 24) or (hour <= end_time and hour >= 0) 
+
+    # 判斷時間是否在範圍內
+        return start_time <= hour <= end_time
 
     # 判斷要運算的地圖範圍 (最東)(最北)(最西)(最南)
     def __findBoundary(self, df):
@@ -445,8 +443,8 @@ def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Feature_value_judgment()
     test.inputFile(file_path)
-    test.inputStarttime(0)
-    test.inputEndtime(24)
+    test.inputStarttime(23)
+    test.inputEndtime(5)
     test.inputDroneSpeed(60)
     test.inputQuantity(100)
     test.inputFeaturesLowest(60)
