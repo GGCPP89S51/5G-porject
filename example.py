@@ -45,7 +45,9 @@ class Drone_deployment(bd.Feature_value_judgment):
         print(len(points))
         self.kdtree = cKDTree(points)
 
-    def night_time_analysis(self):
+    def night_time_analysis(self,num):
+        hot_point = []
+        risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
@@ -65,10 +67,27 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
-                counter += 1
-        print(EndPoint)
                 
-    def commuting_work_time_analysis(self):
+        point = EndPoint
+        for i in range(0,num):
+            Hot_point = 0
+            count = 0
+            for j in range(len(point)):
+                if point[j][2] > Hot_point :
+                    Hot_point = point[j][2]
+                    count = j
+            hot_point.append(point[count])
+            risk_value.append(point[count][2])
+            point[count][2] = 0
+        
+        for i in range(0,len(hot_point)):
+            hot_point[i][2] = risk_value[i]   
+             
+        print(hot_point)
+                
+    def commuting_work_time_analysis(self,num):
+        hot_point = []
+        risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
@@ -84,11 +103,31 @@ class Drone_deployment(bd.Feature_value_judgment):
         query_points = cKDTree(query_points)
         # 使用 KD-Tree 查找在1公里內的點
         indices = self.kdtree.query_ball_tree(query_points, r=self.serch_radius*0.01)
+        counter = 0
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
                 
-    def work_time_analysis(self):
+        point = EndPoint
+        for i in range(0,num):
+            Hot_point = 0
+            count = 0
+            for j in range(len(point)):
+                if point[j][2] > Hot_point :
+                    Hot_point = point[j][2]
+                    count = j
+            hot_point.append(point[count])
+            risk_value.append(point[count][2])
+            point[count][2] = 0
+        
+        for i in range(0,len(hot_point)):
+            hot_point[i][2] = risk_value[i]   
+             
+        print(hot_point)
+                
+    def work_time_analysis(self,num):
+        hot_point = []
+        risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
@@ -104,11 +143,31 @@ class Drone_deployment(bd.Feature_value_judgment):
         query_points = cKDTree(query_points)
         # 使用 KD-Tree 查找在1公里內的點
         indices = self.kdtree.query_ball_tree(query_points, r=self.serch_radius*0.01)
+        counter = 0
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
                 
-    def commuting_off_work_time_analysis(self):
+        point = EndPoint
+        for i in range(0,num):
+            Hot_point = 0
+            count = 0
+            for j in range(len(point)):
+                if point[j][2] > Hot_point :
+                    Hot_point = point[j][2]
+                    count = j
+            hot_point.append(point[count])
+            risk_value.append(point[count][2])
+            point[count][2] = 0
+        
+        for i in range(0,len(hot_point)):
+            hot_point[i][2] = risk_value[i]   
+             
+        print(hot_point)
+                
+    def commuting_off_work_time_analysis(self,num):
+        hot_point = []
+        risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
@@ -124,11 +183,31 @@ class Drone_deployment(bd.Feature_value_judgment):
         query_points = cKDTree(query_points)
         # 使用 KD-Tree 查找在1公里內的點
         indices = self.kdtree.query_ball_tree(query_points, r=self.serch_radius*0.01)
+        counter = 0
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
                 
-    def Leisure_time_analysis(self):
+        point = EndPoint
+        for i in range(0,num):
+            Hot_point = 0
+            count = 0
+            for j in range(len(point)):
+                if point[j][2] > Hot_point :
+                    Hot_point = point[j][2]
+                    count = j
+            hot_point.append(point[count])
+            risk_value.append(point[count][2])
+            point[count][2] = 0
+        
+        for i in range(0,len(hot_point)):
+            hot_point[i][2] = risk_value[i]   
+             
+        print(hot_point)
+                
+    def Leisure_time_analysis(self,num):
+        hot_point = []
+        risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
@@ -144,16 +223,34 @@ class Drone_deployment(bd.Feature_value_judgment):
         query_points = cKDTree(query_points)
         # 使用 KD-Tree 查找在1公里內的點
         indices = self.kdtree.query_ball_tree(query_points, r=self.serch_radius*0.01)
+        counter = 0
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
+                
+        point = EndPoint
+        for i in range(0,num):
+            Hot_point = 0
+            count = 0
+            for j in range(len(point)):
+                if point[j][2] > Hot_point :
+                    Hot_point = point[j][2]
+                    count = j
+            hot_point.append(point[count])
+            risk_value.append(point[count][2])
+            point[count][2] = 0
+        
+        for i in range(0,len(hot_point)):
+            hot_point[i][2] = risk_value[i]   
+             
+        print(hot_point)
                 
 
 def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Drone_deployment()
-    test.computingHotspots(file_path,45)
-    test.night_time_analysis()
+    test.computingHotspots(file_path,60)
+    test.night_time_analysis(10)
 if __name__=="__main__":
     main()
 
