@@ -1,4 +1,5 @@
-from PyQt6 import QtWidgets, QtCore ,QtWebEngineWidgets
+from PyQt6 import QtWidgets, QtCore 
+from PyQt5 import QtWebEngineWidgets
 import sys, cv2, big_data
 from PyQt6.QtGui import *
 from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest
