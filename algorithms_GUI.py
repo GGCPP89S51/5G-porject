@@ -1,5 +1,4 @@
-from PyQt6 import QtWidgets, QtCore 
-from PyQt5 import QtWebEngineWidgets
+from PyQt6 import QtWidgets, QtCore, QtWebEngineWidgets
 import sys, cv2, big_data
 from PyQt6.QtGui import *
 from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest
@@ -41,6 +40,10 @@ class Algorithms_GUI(QtWidgets.QWidget):
             img = self.test.outputFeatrueMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
         elif self.img_combobox.currentIndex() == 3:
+            self.label.setPixmap(
+                self.openvcImag_to_QPixmap(self.test.outputAreaMatrixImg())
+            )
+        elif self.img_combobox.currentIndex() == 4:
             url = QtCore.QUrl(self.test.outputImgWebUrl(key))
             self.load_map_image(url)
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -81,7 +84,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         dronePosition = self.test.outEndPoint()
         for index, i in enumerate(dronePosition):
             item = (
-                str(index)
+                str(index + 1)
                 + " 緯度:"
                 + str(i[1])
                 + ", 經度:"
@@ -128,7 +131,9 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.file_name_label = QtWidgets.QLabel()
         self.file_name_label.setWordWrap(True)
         self.img_combobox = QtWidgets.QComboBox(self)
-        self.img_combobox.addItems(["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機部屬位置地圖"])
+        self.img_combobox.addItems(
+            ["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機覆蓋範圍", "無人機部屬位置地圖"]
+        )
         self.img_combobox.currentIndexChanged.connect(self.show_img)
         self.img_combobox.setDisabled(True)
         self.droneQuantityLabel = QtWidgets.QLabel("無人機數量:")
