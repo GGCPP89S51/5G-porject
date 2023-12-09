@@ -15,7 +15,7 @@ class Drone_deployment(bd.Feature_value_judgment):
 
         self.inputDroneSpeed(DroneSpeed)
         self.inputQuantity(1000)
-        self.inputFeaturesLowest(60)
+        self.inputFeaturesLowest(30)
         self.inputStarttime (0) 
         self.inputEndtime(24)
         
@@ -49,22 +49,100 @@ class Drone_deployment(bd.Feature_value_judgment):
         if self.kdtree is None:
             self.build_kd_tree()
         self.start_time = 23
-        self.end_time = 5    
+        self.end_time = 4    
         df = pd.read_csv(self.file, encoding="utf-8")
         df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
 
         # 要查找的點
         query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
-        print(query_points)
+        print(len(query_points))
         query_points = cKDTree(query_points)
         # 使用 KD-Tree 查找在1公里內的點
-        indices = self.kdtree.query_ball_tree(query_points, r=0.001)
-        
+        indices = self.kdtree.query_ball_tree(query_points, r=0.01)
         for i in range( 0 , len(indices)):
             for j in range(0,len(indices[i])) :
                 EndPoint[i][2] += 1
+                
+    def commuting_work_time_analysis(self):
+        EndPoint = self.EndPoint
+        self.inputFeaturesLowest(30)
+        if self.kdtree is None:
+            self.build_kd_tree()
+        self.start_time = 5
+        self.end_time = 8    
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
 
-        print(EndPoint)
+        # 要查找的點
+        query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
+        print(len(query_points))
+        query_points = cKDTree(query_points)
+        # 使用 KD-Tree 查找在1公里內的點
+        indices = self.kdtree.query_ball_tree(query_points, r=0.01)
+        for i in range( 0 , len(indices)):
+            for j in range(0,len(indices[i])) :
+                EndPoint[i][2] += 1
+                
+    def work_time_analysis(self):
+        EndPoint = self.EndPoint
+        self.inputFeaturesLowest(30)
+        if self.kdtree is None:
+            self.build_kd_tree()
+        self.start_time = 9
+        self.end_time = 15    
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
+
+        # 要查找的點
+        query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
+        print(len(query_points))
+        query_points = cKDTree(query_points)
+        # 使用 KD-Tree 查找在1公里內的點
+        indices = self.kdtree.query_ball_tree(query_points, r=0.01)
+        for i in range( 0 , len(indices)):
+            for j in range(0,len(indices[i])) :
+                EndPoint[i][2] += 1
+                
+    def commuting_off_work_time_analysis(self):
+        EndPoint = self.EndPoint
+        self.inputFeaturesLowest(30)
+        if self.kdtree is None:
+            self.build_kd_tree()
+        self.start_time = 16
+        self.end_time = 18    
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
+
+        # 要查找的點
+        query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
+        print(len(query_points))
+        query_points = cKDTree(query_points)
+        # 使用 KD-Tree 查找在1公里內的點
+        indices = self.kdtree.query_ball_tree(query_points, r=0.01)
+        for i in range( 0 , len(indices)):
+            for j in range(0,len(indices[i])) :
+                EndPoint[i][2] += 1
+                
+    def Leisure_time_analysis(self):
+        EndPoint = self.EndPoint
+        self.inputFeaturesLowest(30)
+        if self.kdtree is None:
+            self.build_kd_tree()
+        self.start_time = 19
+        self.end_time = 22    
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
+
+        # 要查找的點
+        query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
+        print(len(query_points))
+        query_points = cKDTree(query_points)
+        # 使用 KD-Tree 查找在1公里內的點
+        indices = self.kdtree.query_ball_tree(query_points, r=0.01)
+        for i in range( 0 , len(indices)):
+            for j in range(0,len(indices[i])) :
+                EndPoint[i][2] += 1
+                
 
 def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
