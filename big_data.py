@@ -2,10 +2,8 @@ import pandas as pd
 import numpy as np
 import math
 import cv2
-import folium
 from sklearn.model_selection import train_test_split
 from geopy.distance import geodesic
-from folium import plugins
 import matplotlib.pyplot as plt
 
 
@@ -98,7 +96,7 @@ class Feature_value_judgment:
             return True
 
     # 將時間值轉換為小時、分鐘和秒
-        hour, minute, second = time_value // 10000, math.floor(time_value / 10000 % 1 * 100), time_value % 100
+        hour, minute, second = i // 10000, math.floor(i / 10000 % 1 * 100), i % 100
 
         # 確保開始時間小於結束時間
         if start_time > end_time:
