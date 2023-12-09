@@ -92,17 +92,24 @@ class Feature_value_judgment:
 
     # 將時間分割並判斷
     def __judgmentTime(self, i, start_time=None, end_time=None):
+        self.accidents_list[i // 10000] += 1
         if start_time == None or end_time == None:
             return True
 
-    # 將時間值轉換為小時、分鐘和秒
-        hour, minute, second = i // 10000, math.floor(i / 10000 % 1 * 100), i % 100
+        # 將時間值轉換為小時、分鐘和秒
+        hour, minute, second = (
+            time_value // 10000,
+            math.floor(time_value / 10000 % 1 * 100),
+            time_value % 100,
+        )
 
         # 確保開始時間小於結束時間
         if start_time > end_time:
-            return (hour >= start_time and hour < 24) or (hour <= end_time and hour >= 0) 
+            return (hour >= start_time and hour < 24) or (
+                hour <= end_time and hour >= 0
+            )
 
-    # 判斷時間是否在範圍內
+        # 判斷時間是否在範圍內
         return start_time <= hour <= end_time
 
     # 判斷要運算的地圖範圍 (最東)(最北)(最西)(最南)
@@ -489,6 +496,9 @@ class Feature_value_judgment:
                     )
         url = url + "&" + "key=" + key
         return url
+
+    def outputAreaMatrixImg(self):
+        return self.createSpectrogram(self.area_matrix, 0.1)
 
 
 def main():
