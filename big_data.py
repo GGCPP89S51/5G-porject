@@ -98,9 +98,9 @@ class Feature_value_judgment:
 
         # 將時間值轉換為小時、分鐘和秒
         hour, minute, second = (
-            time_value // 10000,
-            math.floor(time_value / 10000 % 1 * 100),
-            time_value % 100,
+            i // 10000,
+            math.floor(i / 10000 % 1 * 100),
+            i % 100,
         )
 
         # 確保開始時間小於結束時間
