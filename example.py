@@ -15,7 +15,7 @@ class Drone_deployment(bd.Feature_value_judgment):
 
         self.inputDroneSpeed(DroneSpeed)
         self.inputQuantity(1000)
-        self.inputFeaturesLowest(30)
+        self.inputFeaturesLowest(60)
         self.inputStarttime (0) 
         self.inputEndtime(24)
         
