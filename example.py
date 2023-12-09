@@ -1,37 +1,82 @@
-import random
-from shapely.geometry import Point
-from shapely.ops import cascaded_union
-import geopy.distance
+import big_data as bd
+import pandas as pd
+from scipy.spatial import cKDTree
+import numpy as np
+from sklearn.model_selection import train_test_split
 
-# 生成隨機的經緯度座標點
-lon1 = random.uniform(-180, 180)
-lat1 = random.uniform(-90, 90)
-lon2 = random.uniform(-180, 180)
-lat2 = random.uniform(-90, 90)
+class Drone_deployment(bd.Feature_value_judgment):
+    def __init__(self):
+        super().__init__()
+        self.EndPoint = []
+        self.file = None
+        self.kdtree = None
 
-# 顯示隨機生成的座標點
-print("隨機生成的座標點1：({}, {})".format(lon1, lat1))
-print("隨機生成的座標點2：({}, {})".format(lon2, lat2))
+    def computingHotspots(self,file,DroneSpeed):
 
-# 計算兩座標之間的距離（單位：公尺）
-distance = geopy.distance.distance((lat1, lon1), (lat2, lon2)).m
+        self.inputDroneSpeed(DroneSpeed)
+        self.inputQuantity(1000)
+        self.inputFeaturesLowest(60)
+        self.inputStarttime (0) 
+        self.inputEndtime(24)
+        
+        self.file = file
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
+        self.boundary = self._Feature_value_judgment__findBoundary(df)
+        self.train_df, self.test_df = train_test_split(
+            df, test_size=0.15, random_state=42
+        )
+        self.train_df = df
+        self.calculate()
 
-# 定義圓的半徑（一公里）
-radius = 1000
+        self.EndPoint = self.outEndPoint()
+        for i in range(0,len(self.EndPoint)) :        
+            self.EndPoint[i][2] = 0
 
-# 使用Shapely庫建立兩個圓的Polygon對象
-circle1 = Point(lon1, lat1).buffer(radius)
-circle2 = Point(lon2, lat2).buffer(radius)
+    def build_kd_tree(self):
+        
+        # 將 EndPoint 轉換為 NumPy 陣列，並建立 KD-Tree
+        sliced_list = [(sublist[1],sublist[0]) for sublist in self.EndPoint]
+        # 將串列轉換為 NumPy 陣列
+        points = np.array(sliced_list)
+        print(len(self.EndPoint))
+        print(len(points))
+        self.kdtree = cKDTree(points)
 
-# 計算兩個圓的交集
-intersection = circle1.intersection(circle2)
+    def night_time_analysis(self):
+        EndPoint = self.EndPoint
+        self.inputFeaturesLowest(30)
+        if self.kdtree is None:
+            self.build_kd_tree()
+        self.start_time = 23
+        self.end_time = 5    
+        df = pd.read_csv(self.file, encoding="utf-8")
+        df = df[df['發生時間'].apply(lambda x: self._Feature_value_judgment__judgmentTime(x,start_time = self.start_time, end_time = self.end_time))]
 
-# 計算交集面積
-intersection_area = intersection.area
+        # 要查找的點
+        query_points = np.array([(lat, lon) for lon, lat in zip(df["GPS經度"], df["GPS緯度"])])
+        print(query_points)
+        query_points = cKDTree(query_points)
+        # 使用 KD-Tree 查找在1公里內的點
+        indices = self.kdtree.query_ball_tree(query_points, r=0.001)
+        
+        for i in range( 0 , len(indices)):
+            for j in range(0,len(indices[i])) :
+                EndPoint[i][2] += 1
 
-# 計算兩個圓的聯集面積
-union_area = cascaded_union([circle1, circle2]).area
+        print(EndPoint)
 
-# 打印結果
-print("兩圓相交的聯集面積：", union_area)
-print("兩圓相交的交集面積：", intersection_area)
+def main():
+    file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
+    test = Drone_deployment()
+    test.computingHotspots(file_path,60)
+    test.night_time_analysis()
+if __name__=="__main__":
+    main()
+
+        
+
+   
+    
+
+
