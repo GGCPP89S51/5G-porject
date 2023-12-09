@@ -83,7 +83,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0,len(hot_point)):
             hot_point[i][2] = risk_value[i]   
              
-        print(hot_point)
+        return hot_point
                 
     def commuting_work_time_analysis(self,num):
         hot_point = []
@@ -123,7 +123,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0,len(hot_point)):
             hot_point[i][2] = risk_value[i]   
              
-        print(hot_point)
+        return hot_point
                 
     def work_time_analysis(self,num):
         hot_point = []
@@ -163,7 +163,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0,len(hot_point)):
             hot_point[i][2] = risk_value[i]   
              
-        print(hot_point)
+        return hot_point
                 
     def commuting_off_work_time_analysis(self,num):
         hot_point = []
@@ -203,7 +203,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0,len(hot_point)):
             hot_point[i][2] = risk_value[i]   
              
-        print(hot_point)
+        return hot_point
                 
     def Leisure_time_analysis(self,num):
         hot_point = []
@@ -243,7 +243,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0,len(hot_point)):
             hot_point[i][2] = risk_value[i]   
              
-        print(hot_point)
+        return hot_point
                 
 
 def main():
