@@ -500,7 +500,7 @@ def main():
     test.inputEndtime(5)
     test.inputDroneSpeed(60)
     test.inputQuantity(100)
-    test.inputFeaturesLowest(60)
+    test.inputFeaturesLowest(30)
     test.inputCityArea(2192)
     test.calculate()
     print(test.outNumberDrones())
