@@ -54,7 +54,7 @@ class Feature_value_judgment:
     # 輸入無人機時速
     def inputDroneSpeed(self, speed):
         self.radius = int(speed / 6)
-
+        
     # 輸入開始時間
     def inputStarttime(self, start_time):
         self.start_time = start_time
