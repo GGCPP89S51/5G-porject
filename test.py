@@ -44,6 +44,7 @@ def update_centroids(clusters):
 def centroids_converged(old_centroids, new_centroids, tolerance):
     return all(np.linalg.norm(old - new) < tolerance for old, new in zip(old_centroids, new_centroids))
 
+# 主程式
 if __name__ == "__main__":
     # 生成示例数据（替换成你的实际数据）
     data = np.random.rand(100, 2)  # 100个二维数据点
