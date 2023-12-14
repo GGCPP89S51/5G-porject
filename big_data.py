@@ -29,6 +29,7 @@ class Feature_value_judgment:
         self.Area = 0
         self.city_area = 0
         self.accidents_list = [0] * 24
+        self.speed = 0
 
     # 輸入檔案
     def inputFile(self, file):
@@ -53,6 +54,7 @@ class Feature_value_judgment:
 
     # 輸入無人機時速
     def inputDroneSpeed(self, speed):
+        self.speed = speed
         self.radius = int(speed / 6)
 
     # 輸入開始時間
@@ -395,8 +397,8 @@ class Feature_value_judgment:
                 coord1 = (end_point[j][1], end_point[j][0])
                 coord2 = (test_point[i][1], test_point[i][0])
                 distance_km = geodesic(coord1, coord2).kilometers
-                if distance_km <= self.radius / 10:
-                    counter -= self.radius / 10
+                if distance_km <= self.speed / 6 / 10:
+                    counter -= 1
                     break
 
         np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
@@ -507,10 +509,10 @@ def main():
 
     test.inputFile(file_path)
     test.inputStarttime(23)
-    test.inputEndtime(5)
-    test.inputDroneSpeed(60)
+    test.inputEndtime(0)
+    test.inputDroneSpeed(45)
     test.inputQuantity(100)
-    test.inputFeaturesLowest(30)
+    test.inputFeaturesLowest(60)
     test.inputCityArea(2192)
     test.calculate()
     print(test.outNumberDrones())
