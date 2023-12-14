@@ -1,5 +1,5 @@
 pandas
---upgrade numpy 
+numpy 
 openCV-Python
 sklearn
 geopy
