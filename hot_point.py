@@ -19,6 +19,7 @@ class Drone_deployment(bd.Feature_value_judgment):
     #計算部屬點
     def computingHotspots(self):
 
+        '''
         self.inputQuantity(1000)
         self.inputFeaturesLowest(60)
         self.inputStarttime (0) 
@@ -34,7 +35,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         )
         self.train_df = df
         self.calculate()
-
+        '''
         self.EndPoint = self.outEndPoint()
         for i in range(0,len(self.EndPoint)) :        
             self.EndPoint[i][2] = 0
