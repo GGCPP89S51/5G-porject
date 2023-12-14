@@ -54,7 +54,7 @@ class Feature_value_judgment:
     # 輸入無人機時速
     def inputDroneSpeed(self, speed):
         self.radius = int(speed / 6)
-        
+
     # 輸入開始時間
     def inputStarttime(self, start_time):
         self.start_time = start_time
@@ -395,8 +395,8 @@ class Feature_value_judgment:
                 coord1 = (end_point[j][1], end_point[j][0])
                 coord2 = (test_point[i][1], test_point[i][0])
                 distance_km = geodesic(coord1, coord2).kilometers
-                if distance_km <= 1:
-                    counter -= 1
+                if distance_km <= self.radius / 10:
+                    counter -= self.radius / 10
                     break
 
         np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
