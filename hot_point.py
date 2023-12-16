@@ -85,9 +85,12 @@ class Drone_deployment(bd.Feature_value_judgment):
             Hot_point = 0
             count = 0
             for j in range(len(point)):
+            
                 if point[j][2] > Hot_point:
                     Hot_point = point[j][2]
                     count = j
+            if point[count] in hot_point:
+                continue        
             hot_point.append(point[count])
             risk_value.append(point[count][2])
             point[count][2] = 0
@@ -131,7 +134,7 @@ def main():
     print(test.commuting_work_time_analysis(10))
     print(test.work_time_analysis(10))
     print(test.commuting_off_work_time_analysis(10))
-    print(test.Leisure_time_analysis(10))
+    print(test.Leisure_time_analysis(100))
 
 
 if __name__ == "__main__":
