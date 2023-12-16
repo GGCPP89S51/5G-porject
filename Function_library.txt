@@ -1,8 +1,0 @@
-pandas
-numpy 
-openCV-Python
-sklearn
-geopy
-matplotlib
-scipy
-PyQt6
