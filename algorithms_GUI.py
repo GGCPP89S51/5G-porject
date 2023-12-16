@@ -99,6 +99,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.layout.addRow(self.probabilityLabel, self.probabilityOutput)
         self.layout.addRow(self.dronePositionLabel)
         self.layout.addRow(self.dronePositionListwidget)
+        self.kd_filePath = None
         return tab
 
     def create_kdtree_algorithm(self):
@@ -136,6 +137,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
         self.kd_label = QtWidgets.QLabel(tab)
         self.kd_label.setGeometry(310, 10, 560, 535)
+        self.kd_filePath = None
 
         return tab
 
@@ -144,11 +146,15 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_file_name_label.setText(self.kd_filePath)
 
     def kd_start(self):
-        self.kd = hot_point.Drone_deployment()
-        self.kd.computingHotspots(
-            self.kd_filePath, int(self.kd_drone_speed_input.text())
-        )
-        self.kd_show()
+        if self.kd_filePath == None:
+            self.mbox = QtWidgets.QMessageBox(self)
+            self.mbox.information(self, "warning", "Please select a file")
+        else:
+            self.kd = hot_point.Drone_deployment()
+            self.kd.computingHotspots(
+                self.kd_filePath, int(self.kd_drone_speed_input.text())
+            )
+            self.kd_show()
 
     def kd_show(self):
         num = int(self.kd_droneQuantityInput.text())
@@ -278,36 +284,40 @@ class Algorithms_GUI(QtWidgets.QWidget):
         reply.deleteLater()
 
     def start(self):
-        self.clear()
-        self.test = big_data.Feature_value_judgment()
-        self.test.inputFile(self.filePath)
-        self.test.inputStarttime(int(self.start_time_input.text()))
-        self.test.inputEndtime(int(self.end_time_input.text()))
-        self.test.inputDroneSpeed(int(self.drone_speed_input.text()))
-        self.test.inputQuantity(int(self.droneQuantityInput.text()))
-        self.test.inputFeaturesLowest(int(self.lowestRiskInput.text()))
-        self.test.inputCityArea(int(self.cityAreaInput.text()))
-        self.test.calculate()
-        self.img_combobox.setDisabled(False)
-        self.show_img()
-        self.droneDispatchQuantityOutput.setText(str(self.test.outNumberDrones()))
-        self.droneCoverageAreaOutput.setText(str(self.test.outCoverageArea()))
-        self.droneProportionAreaCityOutput.setText(
-            "%.2f" % self.test.outputProportionAreaCity() + "%"
-        )
-        self.probabilityOutput.setText(str(self.test.outputProbability()) + "%")
-        dronePosition = self.test.outEndPoint()
-        for index, i in enumerate(dronePosition):
-            item = (
-                str(index + 1)
-                + " 緯度:"
-                + str(i[1])
-                + ", 經度:"
-                + str(i[0])
-                + ", 危險值:"
-                + str(int(i[2]))
+        if self.filePath == None:
+            self.mbox = QtWidgets.QMessageBox(self)
+            self.mbox.information(self, "warning", "Please select a file")
+        else:
+            self.clear()
+            self.test = big_data.Feature_value_judgment()
+            self.test.inputFile(self.filePath)
+            self.test.inputStarttime(int(self.start_time_input.text()))
+            self.test.inputEndtime(int(self.end_time_input.text()))
+            self.test.inputDroneSpeed(int(self.drone_speed_input.text()))
+            self.test.inputQuantity(int(self.droneQuantityInput.text()))
+            self.test.inputFeaturesLowest(int(self.lowestRiskInput.text()))
+            self.test.inputCityArea(int(self.cityAreaInput.text()))
+            self.test.calculate()
+            self.img_combobox.setDisabled(False)
+            self.show_img()
+            self.droneDispatchQuantityOutput.setText(str(self.test.outNumberDrones()))
+            self.droneCoverageAreaOutput.setText(str(self.test.outCoverageArea()))
+            self.droneProportionAreaCityOutput.setText(
+                "%.2f" % self.test.outputProportionAreaCity() + "%"
             )
-            self.dronePositionListwidget.addItem(item)
+            self.probabilityOutput.setText(str(self.test.outputProbability()) + "%")
+            dronePosition = self.test.outEndPoint()
+            for index, i in enumerate(dronePosition):
+                item = (
+                    str(index + 1)
+                    + " 緯度:"
+                    + str(i[1])
+                    + ", 經度:"
+                    + str(i[0])
+                    + ", 危險值:"
+                    + str(int(i[2]))
+                )
+                self.dronePositionListwidget.addItem(item)
 
     def clear(self):
         self.dronePositionListwidget.clear()
