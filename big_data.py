@@ -372,7 +372,7 @@ class Feature_value_judgment:
         print(self.matrix.shape, feature_matrix.shape)
 
         # self.create_spectrogram(feature_matrix, 10)
-        np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
+        #np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
         deployment_point = self.__point(self.matrix, feature_matrix, self.radius)
         print(deployment_point)
         print(np.shape(deployment_point))
@@ -401,7 +401,7 @@ class Feature_value_judgment:
                     counter -= 1
                     break
 
-        np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
+        #np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
         self.end_point = end_point
