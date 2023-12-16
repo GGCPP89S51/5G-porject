@@ -148,7 +148,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
     def kd_start(self):
         if self.kd_filePath == None:
             self.mbox = QtWidgets.QMessageBox(self)
-            self.mbox.information(self, "warring", "Please select a file")
+            self.mbox.information(self, "warning", "Please select a file")
         else:
             self.kd = hot_point.Drone_deployment()
             self.kd.computingHotspots(
@@ -286,7 +286,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
     def start(self):
         if self.filePath == None:
             self.mbox = QtWidgets.QMessageBox(self)
-            self.mbox.information(self, "warring", "Please select a file")
+            self.mbox.information(self, "warning", "Please select a file")
         else:
             self.clear()
             self.test = big_data.Feature_value_judgment()
