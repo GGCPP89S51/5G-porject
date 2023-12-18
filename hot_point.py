@@ -77,6 +77,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         indices = self.kdtree.query_ball_tree(query_points, r=self.serch_radius * 0.01)
         counter = 0
         for i in range(0, len(indices)):
+            EndPoint[i][2] = 0
             for j in range(0, len(indices[i])):
                 EndPoint[i][2] += 1
 
