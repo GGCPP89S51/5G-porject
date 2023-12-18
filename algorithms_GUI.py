@@ -3,6 +3,7 @@ import sys, cv2, big_data, hot_point
 from PyQt6.QtGui import *
 from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 import requests
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 key = "AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo"
 
@@ -73,6 +74,13 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
         self.label = QtWidgets.QLabel(tab)
         self.label.setGeometry(310, 10, 560, 535)
+        self.label.setVisible(True)
+
+        self.graphicview = QtWidgets.QGraphicsView(tab)
+        self.graphicview.setGeometry(310, 10, 560, 535)
+        self.graphicscene = QtWidgets.QGraphicsScene()
+        self.graphicscene.setSceneRect(0, 0, 540, 515)
+        self.graphicview.setScene(self.graphicscene)
 
         self.box = QtWidgets.QWidget(tab)
         self.box.setGeometry(10, 10, 290, 535)
@@ -246,25 +254,36 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
     def show_img(self):
         if self.img_combobox.currentIndex() == 0:
-            img = QImage("AccidentsListImg.png")
-            self.label.setPixmap(QPixmap.fromImage(img))
+            self.label.setVisible(False)
+            self.graphicview.setVisible(True)
+            canvas = FigureCanvas(self.test.creatAccidentsListImg())
+            self.graphicscene.addWidget(canvas)
+            # self.label.setPixmap(QPixmap.fromImage(img))
         elif self.img_combobox.currentIndex() == 1:
+            self.label.setVisible(True)
+            self.graphicview.setVisible(False)
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
             img = self.test.outputMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
         elif self.img_combobox.currentIndex() == 2:
+            self.label.setVisible(True)
+            self.graphicview.setVisible(False)
             self.slider.setDisabled(False)
             self.slider.setRange(0, self.test.outNumberDrones())
             self.slider.setTickInterval(1)
             img = self.test.outputFeatrueMatrixChanges(self.slider.value())
             self.label.setPixmap(self.openvcImag_to_QPixmap(img))
         elif self.img_combobox.currentIndex() == 3:
+            self.label.setVisible(True)
+            self.graphicview.setVisible(False)
             self.label.setPixmap(
                 self.openvcImag_to_QPixmap(self.test.outputAreaMatrixImg())
             )
         elif self.img_combobox.currentIndex() == 4:
+            self.label.setVisible(True)
+            self.graphicview.setVisible(False)
             url = QtCore.QUrl(self.test.outputImgWebUrl(key))
             self.load_map_image(url)
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)

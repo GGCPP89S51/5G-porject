@@ -372,7 +372,7 @@ class Feature_value_judgment:
         print(self.matrix.shape, feature_matrix.shape)
 
         # self.create_spectrogram(feature_matrix, 10)
-        #np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
+        # np.savetxt("matrix.csv", feature_matrix, delimiter=",", fmt="%d")
         deployment_point = self.__point(self.matrix, feature_matrix, self.radius)
         print(deployment_point)
         print(np.shape(deployment_point))
@@ -401,7 +401,7 @@ class Feature_value_judgment:
                     counter -= 1
                     break
 
-        #np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
+        # np.savetxt("area_matrix.csv", self.area_matrix, delimiter=",", fmt="%d")
         Probability = counter / len(test_point)
         Probability = round((1 - Probability) * 100, 5)
         self.end_point = end_point
@@ -409,16 +409,17 @@ class Feature_value_judgment:
         print("", end_point)
         print(Probability, "%")
         self.calculateArea()
-        self.__creatAccidentsListImg()
+        self.creatAccidentsListImg()
 
-    def __creatAccidentsListImg(self):
+    def creatAccidentsListImg(self):
         x = list(range(24))
-        fig = plt.figure(figsize=(5.5, 5.5))
+        fig = plt.figure(figsize=(5, 5))
         plt.bar(x, self.accidents_list)
         plt.xlabel("time")
         plt.ylabel("Number of car accidents")
         plt.title("Distribution of car accidents in different time periods")
-        plt.savefig("AccidentsListImg.png")
+        # plt.savefig("AccidentsListImg.png")
+        return fig
 
     def calculateArea(self):
         for row in self.area_matrix:
