@@ -165,6 +165,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
             self.kd_show()
 
     def kd_show(self):
+        self.kd_combobox.clear()
         num = int(self.kd_droneQuantityInput.text())
         if self.kd_combobox.currentIndex() == 0:
             self.hot_point = self.kd.night_time_analysis(num)
