@@ -44,7 +44,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.file_name_label.setWordWrap(True)
         self.img_combobox = QtWidgets.QComboBox()
         self.img_combobox.addItems(
-            ["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機覆蓋範圍", "無人機部屬位置地圖"]
+            ["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機覆蓋範圍", "無人機佈署位置地圖"]
         )
         self.img_combobox.currentIndexChanged.connect(self.show_img)
         self.img_combobox.setDisabled(True)
@@ -56,7 +56,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.slider.valueChanged.connect(self.img_change)
         self.probabilityLabel = QtWidgets.QLabel("車禍覆蓋率:")
         self.probabilityOutput = QtWidgets.QLabel()
-        self.dronePositionLabel = QtWidgets.QLabel("無人機部屬位置:")
+        self.dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
         self.dronePositionListwidget = QtWidgets.QListWidget()
         self.dronePositionListwidget.clicked.connect(self.show_drone_position)
         self.lowestRiskLabel = QtWidgets.QLabel("最低風險值:")
@@ -65,7 +65,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.cityAreaLabel = QtWidgets.QLabel("城市面積(平方公里):")
         self.cityAreaInput = QtWidgets.QLineEdit()
         self.cityAreaInput.setText(str(2192))
-        self.droneDispatchQuantityLabel = QtWidgets.QLabel("無人機部屬數量:")
+        self.droneDispatchQuantityLabel = QtWidgets.QLabel("無人機佈署數量:")
         self.droneDispatchQuantityOutput = QtWidgets.QLabel()
         self.droneCoverageAreaLabel = QtWidgets.QLabel("無人機覆蓋面積(平方公里):")
         self.droneCoverageAreaOutput = QtWidgets.QLabel()
@@ -130,7 +130,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
             ["夜間時段:23-4", "上班通勤時段:5-8", "工作時間時段:9-15", "下班通勤時段:16-18", "空閒時段:19-22"]
         )
         self.kd_combobox.currentIndexChanged.connect(self.kd_show)
-        self.kd_dronePositionLabel = QtWidgets.QLabel("無人機部屬位置:")
+        self.kd_dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
         self.kd_dronePositionListwidget = QtWidgets.QListWidget()
         self.kd_dronePositionListwidget.clicked.connect(self.kd_show_drone_position)
 
