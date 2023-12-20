@@ -27,6 +27,15 @@ class Drone_deployment(bd.Feature_value_judgment):
     def inputnum(self,num) :
         self.num = num
 
+    def savecomputingHotspots(self,file,DroneSpeed):
+
+        if self.save_end_point :
+            self.EndPoint = self.save_end_point
+            for i in range(0, len(self.EndPoint)):
+                self.EndPoint[i][2] = 0
+        else :
+            self.computingHotspots(self,file,DroneSpeed)
+
 
     def computingHotspots(self,file,DroneSpeed):
 
@@ -157,7 +166,7 @@ class Drone_deployment(bd.Feature_value_judgment):
 def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Drone_deployment()
-    test.computingHotspots(file_path,60)
+    test.computingHotspot()
     test.inputHotPointStartTime(0)
     test.inputHotPointEndtime(24)
     test.inputnum(10)
