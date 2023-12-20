@@ -15,12 +15,15 @@ class Drone_deployment(bd.Feature_value_judgment):
         self.Hot_point_end_time = 24
         self.num = 10
 
+    #輸入自訂義起始時間
     def inputHotPointStartTime(self, start_time):
         self.Hot_point_start_time = start_time
 
+    #輸入自訂義結束時間
     def inputHotPointEndtime(self, end_time):
         self.Hot_point_end_time = end_time
 
+    #輸入要排名量
     def inputnum(self,num) :
         self.num = num
 
@@ -54,7 +57,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         for i in range(0, len(self.EndPoint)):
             self.EndPoint[i][2] = 0
 
-    def build_kd_tree(self):
+    def __build_kd_tree(self):
         
         # 將 EndPoint 轉換為 NumPy 陣列，並建立 KD-Tree
         sliced_list = [(sublist[1], sublist[0]) for sublist in self.EndPoint]
@@ -64,18 +67,18 @@ class Drone_deployment(bd.Feature_value_judgment):
         print(len(points))
         self.kdtree = cKDTree(points)
 
-    def Function(self) :
+    def __Function(self) :
         hot_point = []
         risk_value = []
         EndPoint = self.EndPoint
         self.inputFeaturesLowest(30)
         if self.kdtree is None:
-            self.build_kd_tree()    
+            self.__build_kd_tree()    
         df = pd.read_csv(self.file, encoding="utf-8")
         df = df[
             df["發生時間"].apply(
                 lambda x: self._Feature_value_judgment__judgmentTime(
-                    x, start_time=self.Hot_point_start_time, end_time=self.Hot_point_end_time
+                    x, start_time=self.start_time, end_time=self.end_time
                 )
             )
         ]
@@ -113,6 +116,42 @@ class Drone_deployment(bd.Feature_value_judgment):
             hot_point[i][2] = risk_value[i]
 
         return hot_point
+
+    #夜間時段
+    def night_time_analysis(self):
+        self.start_time = 23
+        self.end_time = 4
+        return self.__Function()
+
+    #上班時段            
+    def commuting_work_time_analysis(self):
+        self.start_time = 5
+        self.end_time = 8
+        return self.__Function()
+
+    #通勤時段            
+    def work_time_analysis(self):
+        self.start_time = 9
+        self.end_time = 15
+        return self.__Function()
+
+    #下班時段            
+    def commuting_off_work_time_analysis(self):
+        self.start_time = 16
+        self.end_time = 18
+        return self.__Function()
+
+    #休息時段   
+    def Leisure_time_analysis(self):
+        self.start_time = 19
+        self.end_time = 22
+        return self.__Function()
+
+    #自訂義
+    def Customized(self):
+        self.start_time = self.Hot_point_start_time
+        self.end_time = self.Hot_point_end_time
+        return self.__Function()
                 
 
 def main():
@@ -122,7 +161,11 @@ def main():
     test.inputHotPointStartTime(0)
     test.inputHotPointEndtime(24)
     test.inputnum(10)
-    print(test.Function())
+    print(test.Customized())
+    print(test.night_time_analysis())
+    print(test.commuting_work_time_analysis())
+    print(test.Leisure_time_analysis())
+    print(test.work_time_analysis())
 
 
 if __name__ == "__main__":
