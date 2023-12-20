@@ -12,6 +12,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         self.kdtree = None
         self.serch_radius = 0
 
+
     def computingHotspots(self,file,DroneSpeed):
 
         self.inputDroneSpeed(DroneSpeed)
@@ -100,6 +101,10 @@ class Drone_deployment(bd.Feature_value_judgment):
             hot_point[i][2] = risk_value[i]
 
         return hot_point
+
+    def __timecut(self):
+        accidents_list = self.accidents_list
+        
     
     def night_time_analysis(self,num):
         self.start_time = 23
