@@ -61,7 +61,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.dronePositionListwidget.clicked.connect(self.show_drone_position)
         self.lowestRiskLabel = QtWidgets.QLabel("最低風險值:")
         self.lowestRiskInput = QtWidgets.QLineEdit()
-        self.lowestRiskInput.setText(str(60))
+        self.lowestRiskInput.setText(str(50))
         self.cityAreaLabel = QtWidgets.QLabel("城市面積(平方公里):")
         self.cityAreaInput = QtWidgets.QLineEdit()
         self.cityAreaInput.setText(str(2192))
@@ -108,7 +108,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.layout.addRow(self.dronePositionLabel)
         self.layout.addRow(self.dronePositionListwidget)
         self.kd_filePath = None
-        self.test=None
+        self.test = None
         return tab
 
     def create_kdtree_algorithm(self):
@@ -124,7 +124,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_drone_speed_input = QtWidgets.QLineEdit("45")
         self.kd_start_calculat_button = QtWidgets.QPushButton("開始計算")
         self.kd_start_calculat_button.clicked.connect(self.kd_start)
-        self.kd_apply_feature_algorithm_button=QtWidgets.QPushButton("套用計算")
+        self.kd_apply_feature_algorithm_button = QtWidgets.QPushButton("套用計算")
         self.kd_apply_feature_algorithm_button.clicked.connect(self.kd_apply)
         self.kd_droneQuantityLabel = QtWidgets.QLabel("無人機數量:")
         self.kd_droneQuantityInput = QtWidgets.QLineEdit("10")
@@ -134,7 +134,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         )
         self.kd_start_time_input = QtWidgets.QLineEdit()
         self.kd_end_time_input = QtWidgets.QLineEdit()
-        self.kd_use_customize_time_button=QtWidgets.QPushButton("使用自訂時間")
+        self.kd_use_customize_time_button = QtWidgets.QPushButton("使用自訂時間")
         self.kd_use_customize_time_button.clicked.connect(self.kd_customize)
         self.kd_combobox.currentIndexChanged.connect(self.kd_show)
         self.kd_dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
@@ -147,7 +147,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_layout.addRow(self.kd_start_calculat_button)
         self.kd_layout.addRow(self.kd_apply_feature_algorithm_button)
         self.kd_layout.addRow(self.kd_droneQuantityLabel, self.kd_droneQuantityInput)
-        self.kd_layout.addRow(self.kd_start_time_input,self.kd_end_time_input)
+        self.kd_layout.addRow(self.kd_start_time_input, self.kd_end_time_input)
         self.kd_layout.addRow(self.kd_use_customize_time_button)
         self.kd_layout.addRow(self.kd_combobox)
         self.kd_layout.addRow(self.kd_dronePositionLabel)
@@ -180,15 +180,17 @@ class Algorithms_GUI(QtWidgets.QWidget):
             self.mbox.information(self, "warning", "feature演算法沒有計算")
         else:
             self.kd = hot_point.Drone_deployment()
-            self.kd.end_point=self.test.outEndPoint()
+            self.kd.EndPoint = self.test.outEndPoint()
             for i in range(0, len(self.kd.EndPoint)):
                 self.kd.EndPoint[i][2] = 0
+            self.kd.serch_radius = self.test.radius / 10
+            self.kd.file = self.test.file
             self.kd_show()
 
     def kd_customize(self):
         self.kd.inputHotPointStartTime(int(self.kd_start_time_input.text()))
         self.kd.inputHotPointEndtime(int(self.kd_end_time_input.text()))
-        self.hot_point=self.kd.Customized()
+        self.hot_point = self.kd.Customized()
         self.refresh_kd_listwidget(self.hot_point)
 
     def kd_show(self):
@@ -208,6 +210,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
     def refresh_kd_listwidget(self, hot_point):
         self.kd_dronePositionListwidget.clear()
+        self.kd_dronePositionListwidget.addItem("車禍時間分布")
         self.kd_dronePositionListwidget.addItem("全部")
         for i in hot_point:
             string = (
@@ -217,14 +220,18 @@ class Algorithms_GUI(QtWidgets.QWidget):
 
     def kd_show_drone_position(self):
         url = self.outputImgWebUrl(
-            key, self.kd_dronePositionListwidget.currentIndex().row() - 1
+            key, self.kd_dronePositionListwidget.currentIndex().row() - 2
         )
-        self.kd_load_map_image(QtCore.QUrl(url))
-        self.kd_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if self.kd_dronePositionListwidget.currentIndex().row() != 0:
+            self.kd_load_map_image(QtCore.QUrl(url))
+            self.kd_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
     def outputImgWebUrl(self, key, num=None):
         url = "https://maps.googleapis.com/maps/api/staticmap?"
-        if num == -1:
+        if num == -2:
+            img = QImage("AccidentsListImg.png")
+            self.kd_label.setPixmap(QPixmap.fromImage(img))
+        elif num == -1:
             url = url + "center=23.16,120.35" + "&" + "zoom=10" + "&" + "size=470x470"
             for i in self.hot_point:
                 url = url + "&" + "markers="
