@@ -30,9 +30,11 @@ class Feature_value_judgment:
         self.city_area = 0
         self.accidents_list = [0] * 24
         self.speed = 0
+        self.file = None
 
     # 輸入檔案
     def inputFile(self, file):
+        self.file = file
         df = pd.read_csv(file, encoding="utf-8")
         df = df[
             df["發生時間"].apply(
@@ -418,7 +420,7 @@ class Feature_value_judgment:
         plt.xlabel("time")
         plt.ylabel("Number of car accidents")
         plt.title("Distribution of car accidents in different time periods")
-        # plt.savefig("AccidentsListImg.png")
+        plt.savefig("AccidentsListImg.png")
         return fig
 
     def calculateArea(self):
