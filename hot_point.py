@@ -11,6 +11,18 @@ class Drone_deployment(bd.Feature_value_judgment):
         self.EndPoint = []
         self.kdtree = None
         self.serch_radius = 0
+        self.Hot_point_start_time = 0
+        self.Hot_point_end_time = 24
+        self.num = 10
+
+    def inputHotPointStartTime(self, start_time):
+        self.Hot_point_start_time = start_time
+
+    def inputHotPointEndtime(self, end_time):
+        self.Hot_point_end_time = end_time
+
+    def inputnum(self,num) :
+        self.num = num
 
 
     def computingHotspots(self,file,DroneSpeed):
@@ -52,7 +64,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         print(len(points))
         self.kdtree = cKDTree(points)
 
-    def __Function(self,num) :
+    def Function(self) :
         hot_point = []
         risk_value = []
         EndPoint = self.EndPoint
@@ -63,7 +75,7 @@ class Drone_deployment(bd.Feature_value_judgment):
         df = df[
             df["發生時間"].apply(
                 lambda x: self._Feature_value_judgment__judgmentTime(
-                    x, start_time=self.start_time, end_time=self.end_time
+                    x, start_time=self.Hot_point_start_time, end_time=self.Hot_point_end_time
                 )
             )
         ]
@@ -83,7 +95,7 @@ class Drone_deployment(bd.Feature_value_judgment):
                 EndPoint[i][2] += 1
 
         point = EndPoint
-        for i in range(0, num):
+        for i in range(0, self.num):
             Hot_point = 0
             count = 0
             for j in range(len(point)):
@@ -101,46 +113,16 @@ class Drone_deployment(bd.Feature_value_judgment):
             hot_point[i][2] = risk_value[i]
 
         return hot_point
-
-    def __timecut(self):
-        accidents_list = self.accidents_list
-        
-    
-    def night_time_analysis(self,num):
-        self.start_time = 23
-        self.end_time = 4
-        return self.__Function(num)
-                
-    def commuting_work_time_analysis(self,num):
-        self.start_time = 5
-        self.end_time = 8
-        return self.__Function(num)
-                
-    def work_time_analysis(self,num):
-        self.start_time = 9
-        self.end_time = 15
-        return self.__Function(num)
-                
-    def commuting_off_work_time_analysis(self,num):
-        self.start_time = 16
-        self.end_time = 18
-        return self.__Function(num)
-                
-    def Leisure_time_analysis(self,num):
-        self.start_time = 19
-        self.end_time = 22
-        return self.__Function(num)
                 
 
 def main():
     file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
     test = Drone_deployment()
     test.computingHotspots(file_path,60)
-    print(test.night_time_analysis(10))
-    print(test.commuting_work_time_analysis(10))
-    print(test.work_time_analysis(10))
-    print(test.commuting_off_work_time_analysis(10))
-    print(test.Leisure_time_analysis(100))
+    test.inputHotPointStartTime(0)
+    test.inputHotPointEndtime(24)
+    test.inputnum(10)
+    print(test.Function())
 
 
 if __name__ == "__main__":
