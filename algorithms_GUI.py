@@ -108,6 +108,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.layout.addRow(self.dronePositionLabel)
         self.layout.addRow(self.dronePositionListwidget)
         self.kd_filePath = None
+        self.test=None
         return tab
 
     def create_kdtree_algorithm(self):
@@ -123,12 +124,18 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_drone_speed_input = QtWidgets.QLineEdit("45")
         self.kd_start_calculat_button = QtWidgets.QPushButton("開始計算")
         self.kd_start_calculat_button.clicked.connect(self.kd_start)
+        self.kd_apply_feature_algorithm_button=QtWidgets.QPushButton("套用計算")
+        self.kd_apply_feature_algorithm_button.clicked.connect(self.kd_apply)
         self.kd_droneQuantityLabel = QtWidgets.QLabel("無人機數量:")
-        self.kd_droneQuantityInput = QtWidgets.QLineEdit("100")
+        self.kd_droneQuantityInput = QtWidgets.QLineEdit("10")
         self.kd_combobox = QtWidgets.QComboBox()
         self.kd_combobox.addItems(
             ["夜間時段:23-4", "上班通勤時段:5-8", "工作時間時段:9-15", "下班通勤時段:16-18", "空閒時段:19-22"]
         )
+        self.kd_start_time_input = QtWidgets.QLineEdit()
+        self.kd_end_time_input = QtWidgets.QLineEdit()
+        self.kd_use_customize_time_button=QtWidgets.QPushButton("使用自訂時間")
+        self.kd_use_customize_time_button.clicked.connect(self.kd_customize)
         self.kd_combobox.currentIndexChanged.connect(self.kd_show)
         self.kd_dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
         self.kd_dronePositionListwidget = QtWidgets.QListWidget()
@@ -138,7 +145,10 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_layout.addRow(self.kd_open_file_button)
         self.kd_layout.addRow(self.kd_drone_speed_label, self.kd_drone_speed_input)
         self.kd_layout.addRow(self.kd_start_calculat_button)
+        self.kd_layout.addRow(self.kd_apply_feature_algorithm_button)
         self.kd_layout.addRow(self.kd_droneQuantityLabel, self.kd_droneQuantityInput)
+        self.kd_layout.addRow(self.kd_start_time_input,self.kd_end_time_input)
+        self.kd_layout.addRow(self.kd_use_customize_time_button)
         self.kd_layout.addRow(self.kd_combobox)
         self.kd_layout.addRow(self.kd_dronePositionLabel)
         self.kd_layout.addRow(self.kd_dronePositionListwidget)
@@ -164,18 +174,36 @@ class Algorithms_GUI(QtWidgets.QWidget):
             )
             self.kd_show()
 
+    def kd_apply(self):
+        if self.test == None:
+            self.mbox = QtWidgets.QMessageBox(self)
+            self.mbox.information(self, "warning", "feature演算法沒有計算")
+        else:
+            self.kd = hot_point.Drone_deployment()
+            self.kd.end_point=self.test.outEndPoint()
+            for i in range(0, len(self.kd.EndPoint)):
+                self.kd.EndPoint[i][2] = 0
+            self.kd_show()
+
+    def kd_customize(self):
+        self.kd.inputHotPointStartTime(int(self.kd_start_time_input.text()))
+        self.kd.inputHotPointEndtime(int(self.kd_end_time_input.text()))
+        self.hot_point=self.kd.Customized()
+        self.refresh_kd_listwidget(self.hot_point)
+
     def kd_show(self):
         num = int(self.kd_droneQuantityInput.text())
+        self.kd.inputnum(num)
         if self.kd_combobox.currentIndex() == 0:
-            self.hot_point = self.kd.night_time_analysis(num)
+            self.hot_point = self.kd.night_time_analysis()
         elif self.kd_combobox.currentIndex() == 1:
-            self.hot_point = self.kd.commuting_work_time_analysis(num)
+            self.hot_point = self.kd.commuting_work_time_analysis()
         elif self.kd_combobox.currentIndex() == 2:
-            self.hot_point = self.kd.work_time_analysis(num)
+            self.hot_point = self.kd.work_time_analysis()
         elif self.kd_combobox.currentIndex() == 3:
-            self.hot_point = self.kd.commuting_off_work_time_analysis(num)
+            self.hot_point = self.kd.commuting_off_work_time_analysis()
         elif self.kd_combobox.currentIndex() == 4:
-            self.hot_point = self.kd.Leisure_time_analysis(num)
+            self.hot_point = self.kd.Leisure_time_analysis()
         self.refresh_kd_listwidget(self.hot_point)
 
     def refresh_kd_listwidget(self, hot_point):
@@ -342,6 +370,8 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.dronePositionListwidget.clear()
 
     def show_drone_position(self):
+        self.label.setVisible(True)
+        self.graphicview.setVisible(False)
         url = QtCore.QUrl(
             self.test.outputImgWebUrl(
                 key, self.dronePositionListwidget.currentIndex().row()

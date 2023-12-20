@@ -317,7 +317,7 @@ class Feature_value_judgment:
                 )
         self.featrue_matrix_changes.append(self.createSpectrogram(featrue_matrix, 10))
 
-    # 部屬點計算
+    # 佈署點計算
     def __point(self, matrix, feature_matrix, radius):
         quantity = self.quantity
         drone_location = []
@@ -348,7 +348,7 @@ class Feature_value_judgment:
 
         return drone_location
 
-    # 找尋部屬點
+    # 找尋佈署點
     def __deploymentPoint(self):
         # 特徵值矩陣
         eigenvalue_matrix = self.__eigenvalueMatrix(self.radius)
@@ -445,7 +445,7 @@ class Feature_value_judgment:
     def outputFeatrueMatrixChanges(self, i):
         return self.featrue_matrix_changes[i]
 
-    # 輸出部屬點
+    # 輸出佈署點
     def outEndPoint(self):
         return self.end_point
 
