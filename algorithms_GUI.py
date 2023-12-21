@@ -132,10 +132,13 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_combobox.addItems(
             ["夜間時段:23-4", "上班通勤時段:5-8", "工作時間時段:9-15", "下班通勤時段:16-18", "空閒時段:19-22"]
         )
+        self.kd_combobox.setDisabled(True)
+        self.kd_customize_time_label=QtWidgets.QLabel("自定時間(開始時間)(結束時間):")
         self.kd_start_time_input = QtWidgets.QLineEdit()
         self.kd_end_time_input = QtWidgets.QLineEdit()
         self.kd_use_customize_time_button = QtWidgets.QPushButton("使用自訂時間")
         self.kd_use_customize_time_button.clicked.connect(self.kd_customize)
+        self.kd_use_customize_time_button.setDisabled(True)
         self.kd_combobox.currentIndexChanged.connect(self.kd_show)
         self.kd_dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
         self.kd_dronePositionListwidget = QtWidgets.QListWidget()
@@ -147,6 +150,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.kd_layout.addRow(self.kd_start_calculat_button)
         self.kd_layout.addRow(self.kd_apply_feature_algorithm_button)
         self.kd_layout.addRow(self.kd_droneQuantityLabel, self.kd_droneQuantityInput)
+        self.kd_layout.addRow(self.kd_customize_time_label)
         self.kd_layout.addRow(self.kd_start_time_input, self.kd_end_time_input)
         self.kd_layout.addRow(self.kd_use_customize_time_button)
         self.kd_layout.addRow(self.kd_combobox)
@@ -173,6 +177,8 @@ class Algorithms_GUI(QtWidgets.QWidget):
                 self.kd_filePath, int(self.kd_drone_speed_input.text())
             )
             self.kd_show()
+            self.kd_combobox.setDisabled(False)
+            self.kd_use_customize_time_button.setDisabled(False)
 
     def kd_apply(self):
         if self.test == None:
@@ -186,8 +192,12 @@ class Algorithms_GUI(QtWidgets.QWidget):
             self.kd.serch_radius = self.test.radius / 10
             self.kd.file = self.test.file
             self.kd_show()
+            self.kd_combobox.setDisabled(False)
+            self.kd_use_customize_time_button.setDisabled(False)
 
     def kd_customize(self):
+        num = int(self.kd_droneQuantityInput.text())
+        self.kd.inputnum(num)
         self.kd.inputHotPointStartTime(int(self.kd_start_time_input.text()))
         self.kd.inputHotPointEndtime(int(self.kd_end_time_input.text()))
         self.hot_point = self.kd.Customized()
