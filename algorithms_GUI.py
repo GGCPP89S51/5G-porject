@@ -50,7 +50,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.img_combobox.setDisabled(True)
         self.droneQuantityLabel = QtWidgets.QLabel("基站數量:")
         self.droneQuantityInput = QtWidgets.QLineEdit()
-        self.droneQuantityInput.setText(str(100))
+        self.droneQuantityInput.setText(str(90))
         self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
         self.slider.setDisabled(True)
         self.slider.valueChanged.connect(self.img_change)
