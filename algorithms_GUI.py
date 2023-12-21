@@ -44,11 +44,11 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.file_name_label.setWordWrap(True)
         self.img_combobox = QtWidgets.QComboBox()
         self.img_combobox.addItems(
-            ["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "無人機覆蓋範圍", "無人機佈署位置地圖"]
+            ["車禍時間分布圖", "車禍位置分布圖", "車禍位置特徵圖", "基站覆蓋範圍", "基站佈署位置地圖"]
         )
         self.img_combobox.currentIndexChanged.connect(self.show_img)
         self.img_combobox.setDisabled(True)
-        self.droneQuantityLabel = QtWidgets.QLabel("無人機數量:")
+        self.droneQuantityLabel = QtWidgets.QLabel("基站數量:")
         self.droneQuantityInput = QtWidgets.QLineEdit()
         self.droneQuantityInput.setText(str(100))
         self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
@@ -56,20 +56,20 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.slider.valueChanged.connect(self.img_change)
         self.probabilityLabel = QtWidgets.QLabel("車禍覆蓋率:")
         self.probabilityOutput = QtWidgets.QLabel()
-        self.dronePositionLabel = QtWidgets.QLabel("無人機佈署位置:")
+        self.dronePositionLabel = QtWidgets.QLabel("基站佈署位置:")
         self.dronePositionListwidget = QtWidgets.QListWidget()
         self.dronePositionListwidget.clicked.connect(self.show_drone_position)
         self.lowestRiskLabel = QtWidgets.QLabel("最低風險值:")
         self.lowestRiskInput = QtWidgets.QLineEdit()
-        self.lowestRiskInput.setText(str(50))
+        self.lowestRiskInput.setText(str(0))
         self.cityAreaLabel = QtWidgets.QLabel("城市面積(平方公里):")
         self.cityAreaInput = QtWidgets.QLineEdit()
         self.cityAreaInput.setText(str(2192))
-        self.droneDispatchQuantityLabel = QtWidgets.QLabel("無人機佈署數量:")
+        self.droneDispatchQuantityLabel = QtWidgets.QLabel("基站佈署數量:")
         self.droneDispatchQuantityOutput = QtWidgets.QLabel()
-        self.droneCoverageAreaLabel = QtWidgets.QLabel("無人機覆蓋面積(平方公里):")
+        self.droneCoverageAreaLabel = QtWidgets.QLabel("基站覆蓋面積(平方公里):")
         self.droneCoverageAreaOutput = QtWidgets.QLabel()
-        self.droneProportionAreaCityLabel = QtWidgets.QLabel("無人機覆蓋面積占比:")
+        self.droneProportionAreaCityLabel = QtWidgets.QLabel("基站覆蓋面積占比:")
         self.droneProportionAreaCityOutput = QtWidgets.QLabel()
 
         self.label = QtWidgets.QLabel(tab)
@@ -92,14 +92,12 @@ class Algorithms_GUI(QtWidgets.QWidget):
         self.layout.addRow(self.end_time_label, self.end_time_input)
         self.layout.addRow(self.drone_speed_label, self.drone_speed_input)
         self.layout.addRow(self.droneQuantityLabel, self.droneQuantityInput)
-        self.layout.addRow(self.lowestRiskLabel, self.lowestRiskInput)
+        # self.layout.addRow(self.lowestRiskLabel, self.lowestRiskInput)
         self.layout.addRow(self.cityAreaLabel, self.cityAreaInput)
         self.layout.addRow(self.start_calculat_button)
         self.layout.addRow(self.img_combobox)
         self.layout.addRow(self.slider)
-        self.layout.addRow(
-            self.droneDispatchQuantityLabel, self.droneDispatchQuantityOutput
-        )
+        # self.layout.addRow(self.droneDispatchQuantityLabel, self.droneDispatchQuantityOutput)
         self.layout.addRow(self.droneCoverageAreaLabel, self.droneCoverageAreaOutput)
         self.layout.addRow(
             self.droneProportionAreaCityLabel, self.droneProportionAreaCityOutput
@@ -133,7 +131,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
             ["夜間時段:23-4", "上班通勤時段:5-8", "工作時間時段:9-15", "下班通勤時段:16-18", "空閒時段:19-22"]
         )
         self.kd_combobox.setDisabled(True)
-        self.kd_customize_time_label=QtWidgets.QLabel("自定時間(開始時間)(結束時間):")
+        self.kd_customize_time_label = QtWidgets.QLabel("自定時間(開始時間)(結束時間):")
         self.kd_start_time_input = QtWidgets.QLineEdit()
         self.kd_end_time_input = QtWidgets.QLineEdit()
         self.kd_use_customize_time_button = QtWidgets.QPushButton("使用自訂時間")
@@ -242,7 +240,7 @@ class Algorithms_GUI(QtWidgets.QWidget):
             img = QImage("AccidentsListImg.png")
             self.kd_label.setPixmap(QPixmap.fromImage(img))
         elif num == -1:
-            url = url + "center=23.16,120.35" + "&" + "zoom=10" + "&" + "size=470x470"
+            url = url + "center=Tainan" + "&" + "zoom=12" + "&" + "size=470x470"
             for i in self.hot_point:
                 url = url + "&" + "markers="
                 url = url + "size:tiny"
