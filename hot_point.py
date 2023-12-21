@@ -31,7 +31,7 @@ class Drone_deployment(bd.Feature_value_judgment):
     def computingHotspots(self, file, DroneSpeed):
         self.inputDroneSpeed(DroneSpeed)
         self.inputQuantity(1000)
-        self.inputFeaturesLowest(60)
+        self.inputFeaturesLowest(0)
         self.inputStarttime(0)
         self.inputEndtime(24)
         self.serch_radius = self.radius / 10
@@ -151,19 +151,5 @@ class Drone_deployment(bd.Feature_value_judgment):
         return self.__Function()
 
 
-def main():
-    file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
-    test = Drone_deployment()
-    test.computingHotspots(file_path, 60)
-    test.inputHotPointStartTime(0)
-    test.inputHotPointEndtime(24)
-    test.inputnum(10)
-    print(test.Customized())
-    print(test.night_time_analysis())
-    print(test.commuting_work_time_analysis())
-    print(test.Leisure_time_analysis())
-    print(test.work_time_analysis())
 
 
-if __name__ == "__main__":
-    main()

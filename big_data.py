@@ -506,27 +506,3 @@ class Feature_value_judgment:
         return self.createSpectrogram(self.area_matrix, 0.1)
 
 
-def main():
-    file_path = r"臺南市112年上半年道路交通事故原因傷亡統計.csv"
-    test = Feature_value_judgment()
-
-    test.inputFile(file_path)
-    test.inputStarttime(23)
-    test.inputEndtime(0)
-    test.inputDroneSpeed(45)
-    test.inputQuantity(100)
-    test.inputFeaturesLowest(60)
-    test.inputCityArea(2192)
-    test.calculate()
-    print(test.outNumberDrones())
-    test.outputMatrixChanges(1)
-    test.outputFeatrueMatrixChanges(1)
-    test.outputProportionAreaCity()
-    print(test.outEndPoint())
-    print(test.outputProbability())
-    print(test.accidents_list)
-    # print(test.outputImgWebUrl("AIzaSyDwJ3GEiiLnMB-t-Mx7LzejCYXLW4pNYRo"))
-
-
-if __name__ == "__main__":
-    main()
